@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
+/*
+ * MR Imperial design tokens — light editorial palette.
+ * Warm ivory paper, porcelain surfaces, ink typography, brushed-steel neutrals
+ * and a restrained champagne accent. Change brand colours here only.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory: #f6f2ea;
+  --porcelain: #fbf9f4;
+  --linen: #eee7da;
+  --sand: #e4d9c6;
+  --rule: #ddd3c2;
+  --rule-soft: #e9e2d5;
+  --steel: #a7a39b;
+  --mist: #7d766b;
+  --graphite: #4a443b;
+  --ink: #17140f;
+
+  --champagne: #b8955c;
+  --champagne-soft: #d9c39b;
+  --champagne-ink: #7a5a2b; /* accent used for text: AA on ivory */
+
+  --success: #3e6a4d;
+  --success-soft: #e3ece2;
+  --danger: #9c3a2b;
+  --danger-soft: #f4e2dc;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --shadow-soft: 0 1px 0 rgba(23, 20, 15, 0.04), 0 18px 40px -24px rgba(23, 20, 15, 0.28);
+  --shadow-lift: 0 30px 80px -40px rgba(23, 20, 15, 0.45);
+  --header-h: 64px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ivory: var(--ivory);
+  --color-porcelain: var(--porcelain);
+  --color-linen: var(--linen);
+  --color-sand: var(--sand);
+  --color-rule: var(--rule);
+  --color-rule-soft: var(--rule-soft);
+  --color-steel: var(--steel);
+  --color-mist: var(--mist);
+  --color-graphite: var(--graphite);
+  --color-ink: var(--ink);
+  --color-champagne: var(--champagne);
+  --color-champagne-soft: var(--champagne-soft);
+  --color-champagne-ink: var(--champagne-ink);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-serif: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-lift: var(--shadow-lift);
+
+  --tracking-label: 0.22em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  background: var(--ivory);
+  color: var(--ink);
+  scroll-padding-top: calc(var(--header-h) + 12px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.lenis) {
+    scroll-behavior: smooth;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--champagne-soft);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Motion: content is visible by default; only hidden when JS motion is ready. */
+html.motion-ready [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+html.motion-ready [data-reveal="fade"] {
+  transform: none;
+}
+
+@layer components {
+  .label {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .display {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 0.95;
+  }
+
+  .hairline {
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .paper {
+    background-color: var(--porcelain);
+    background-image:
+      radial-gradient(120% 80% at 80% 0%, rgba(217, 195, 155, 0.18), transparent 60%),
+      radial-gradient(90% 60% at 0% 100%, rgba(167, 163, 155, 0.12), transparent 60%);
+  }
+
+  .brushed {
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0) 0 2px, rgba(255, 255, 255, 0.35) 2px 3px),
+      linear-gradient(180deg, #f3eee5, #e7dfd1);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--linen) 0%, var(--porcelain) 50%, var(--linen) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
 }
