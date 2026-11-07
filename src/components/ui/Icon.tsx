@@ -20,7 +20,8 @@ type Name =
   | "instagram"
   | "tiktok"
   | "youtube"
-  | "play";
+  | "play"
+  | "pause";
 
 const paths: Record<Name, React.ReactNode> = {
   truck: (
@@ -96,6 +97,7 @@ const paths: Record<Name, React.ReactNode> = {
     </>
   ),
   play: <path d="M8 5.5v13l10.5-6.5L8 5.5Z" />,
+  pause: <path d="M8.5 5.5v13M15.5 5.5v13" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   alert: (
     <>

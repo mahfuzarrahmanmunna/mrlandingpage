@@ -2,8 +2,9 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
+import type { PublicVariant } from "@/lib/types";
 import { useStorefront } from "./StorefrontProvider";
 
 const WatchViewer = dynamic(() => import("./WatchViewer"), {
@@ -33,18 +34,38 @@ function useReducedMotion() {
 
 type Mode = "photo" | "3d" | "video";
 
+const AUTOPLAY_MS = 4500;
+
 const thumbBase =
   "relative size-16 shrink-0 snap-start overflow-hidden rounded-[var(--radius-md)] bg-linen transition sm:size-[4.5rem]";
 const thumbState = (active: boolean) =>
   active ? "ring-2 ring-ink ring-offset-2 ring-offset-ivory" : "opacity-75 ring-1 ring-rule hover:opacity-100";
 
 export function Gallery() {
-  const { product, settings, images, variant } = useStorefront();
+  const { product, settings, images: variantImages, variant, setVariantKey } = useStorefront();
   const [index, setIndex] = useState(0);
   const [mode, setMode] = useState<Mode>("photo");
   const [failed3D, setFailed3D] = useState(false);
   const reducedMotion = useReducedMotion();
   const pointer = useRef<{ x: number; y: number; id: number } | null>(null);
+  // Autoplay: the user can stop it; hovering or focusing inside pauses it.
+  const [stopped, setStopped] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  // The selected colour's photos first, then the lead photo of every other
+  // colour so the slider shows the whole range. `from` marks those extras.
+  const images = useMemo(() => {
+    const own = variantImages.map((img) => ({ ...img, from: undefined as PublicVariant | undefined }));
+    const seen = new Set(own.map((img) => img.url));
+    const others = product.variants.flatMap((v) => {
+      const lead = v.images[0];
+      if (v.key === variant.key || !lead || seen.has(lead.url)) return [];
+      seen.add(lead.url);
+      return [{ ...lead, from: v }];
+    });
+    return [...own, ...others];
+  }, [variantImages, product.variants, variant.key]);
 
   // Reset to the first photo whenever the variant (and so the image set) changes.
   const [lastVariant, setLastVariant] = useState(variant.key);
@@ -67,6 +88,16 @@ export function Gallery() {
     [count],
   );
 
+  const autoplay = mode === "photo" && count > 1 && !reducedMotion && !stopped && !hovered && !focused;
+  useEffect(() => {
+    if (!autoplay) return;
+    // Re-armed on every index change, so manual navigation restarts the wait.
+    const id = window.setTimeout(() => {
+      if (!document.hidden) setIndex((i) => (i + 1) % count);
+    }, AUTOPLAY_MS);
+    return () => window.clearTimeout(id);
+  }, [autoplay, index, count]);
+
   const onFail = useCallback(() => {
     setFailed3D(true);
     setMode("photo");
@@ -82,6 +113,12 @@ export function Gallery() {
       role="region"
       aria-roledescription="carousel"
       aria-label={`${product.title} images`}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={(e) => e.target.matches(":focus-visible") && setFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
+      }}
       onKeyDown={(e) => {
         if (mode !== "photo") return;
         if (e.key === "ArrowRight") {
@@ -154,6 +191,31 @@ export function Gallery() {
           />
         )}
 
+        {mode === "photo" && current.from ? (
+          current.from.available ? (
+            <button
+              type="button"
+              onClick={() => setVariantKey(current.from!.key)}
+              className="label absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-porcelain/90 py-1.5 pl-1.5 pr-3 text-[0.62rem] text-ink shadow-soft backdrop-blur transition hover:bg-porcelain"
+            >
+              <span
+                aria-hidden
+                className="size-4 rounded-full ring-1 ring-black/10"
+                style={{ background: current.from.swatch ?? "var(--linen)" }}
+              />
+              {current.from.name} — select this colour
+            </button>
+          ) : (
+            <span className="label absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-porcelain/90 py-1.5 pl-1.5 pr-3 text-[0.62rem] text-mist backdrop-blur">
+              <span
+                aria-hidden
+                className="size-4 rounded-full ring-1 ring-black/10"
+                style={{ background: current.from.swatch ?? "var(--linen)" }}
+              />
+              {current.from.name} · sold out
+            </span>
+          )
+        ) : null}
         {mode === "photo" && current.placeholder ? (
           <span className="label absolute left-3 top-3 rounded-full bg-porcelain/90 px-3 py-1.5 text-[0.58rem] text-mist backdrop-blur-sm">
             Placeholder image
@@ -173,6 +235,16 @@ export function Gallery() {
             >
               {index + 1} / {count}
             </p>
+            {!reducedMotion ? (
+              <button
+                type="button"
+                onClick={() => setStopped((v) => !v)}
+                className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-ink/70 text-porcelain backdrop-blur transition hover:bg-ink/85"
+                aria-label={stopped ? "Start automatic slideshow" : "Stop automatic slideshow"}
+              >
+                <Icon name={stopped ? "play" : "pause"} size={14} strokeWidth={stopped ? 0 : 2} className={stopped ? "fill-current" : undefined} />
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => go(-1)}

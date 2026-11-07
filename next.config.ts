@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
+      // ImgBB direct links (served from both domains).
+      { protocol: "https", hostname: "i.ibb.co" },
+      { protocol: "https", hostname: "i.ibb.co.com" },
       ...extraHosts.map((hostname) => ({ protocol: "https" as const, hostname })),
     ],
   },

@@ -1,82 +1,109 @@
 import Image from "next/image";
+import { Icon } from "@/components/ui/Icon";
 import { langOf } from "@/lib/lang";
-import type { PublicProduct, SpecKey } from "@/lib/types";
+import type { IconName, ProductSpecs, PublicProduct } from "@/lib/types";
 
-const LABELS: Record<SpecKey, string> = {
-  brand: "Brand",
-  model: "Model",
-  sku: "Reference / SKU",
-  powerSource: "Power source",
-  caseShape: "Case shape",
-  dialSize: "Case diameter",
-  caseThickness: "Case thickness",
-  caseMaterial: "Case material",
-  strapMaterial: "Strap / bracelet",
-  bandLength: "Band length",
-  bandWidth: "Band width",
-  clasp: "Clasp",
-  movement: "Movement",
-  display: "Display",
-  calendar: "Calendar",
-  luminous: "Luminous",
-  waterResistance: "Water resistance",
-  glass: "Crystal",
-  origin: "Origin",
-  dialColor: "Dial",
-  color: "Colour",
-  warranty: "Warranty",
-};
+type Feature = { icon: IconName; title: string; text: string };
 
-const ORDER: SpecKey[] = [
-  "brand",
-  "model",
-  "sku",
-  "powerSource",
-  "caseShape",
-  "dialSize",
-  "caseThickness",
-  "caseMaterial",
-  "strapMaterial",
-  "bandLength",
-  "bandWidth",
-  "clasp",
-  "movement",
-  "display",
-  "calendar",
-  "luminous",
-  "waterResistance",
-  "glass",
-  "origin",
-  "dialColor",
-  "color",
-  "warranty",
-];
+/** Short display value: first fragment, without seller caveats ("প্রায় 40 mm" → "40 mm"). */
+function clean(value: string | undefined) {
+  const first = value?.split(/\s[—(;]/)[0]?.replace(/[ঀ-৿]+/g, "").replace(/\s+/g, " ").trim();
+  return first || undefined;
+}
 
-/** Section 4 — only fields with a supplied value are rendered. */
+function features(s: ProductSpecs): Feature[] {
+  const list: (Feature | null)[] = [
+    s.movement
+      ? {
+          icon: "clock",
+          title: `${clean(s.movement)} movement`,
+          text: s.powerSource ? `${clean(s.powerSource)} powered for accurate, low-maintenance timekeeping.` : "Accurate, low-maintenance timekeeping.",
+        }
+      : null,
+    s.dialSize
+      ? {
+          icon: "seal",
+          title: `${clean(s.dialSize)} ${clean(s.caseShape)?.toLowerCase() ?? ""} case`.replace(/\s+/g, " "),
+          text: s.caseThickness ? `Slim ${clean(s.caseThickness)} profile that sits comfortably under a shirt cuff.` : "A balanced size for most wrists.",
+        }
+      : null,
+    s.strapMaterial
+      ? {
+          icon: "spark",
+          title: `${clean(s.strapMaterial)} bracelet`,
+          text: `Adjustable links${s.clasp ? ` with a ${clean(s.clasp)?.toLowerCase()}` : ""}.`,
+        }
+      : null,
+    s.calendar
+      ? { icon: "clock", title: `${clean(s.calendar)} display`, text: "See the day and date at a glance." }
+      : null,
+    s.luminous ? { icon: "spark", title: "Luminous hands", text: "Easy to read in low light and at night." } : null,
+    s.glass
+      ? {
+          icon: "shield",
+          title: /glass|crystal/i.test(clean(s.glass) ?? "") ? clean(s.glass)! : `${clean(s.glass)} glass`,
+          text: "Toughened for better scratch resistance than ordinary glass.",
+        }
+      : null,
+    s.waterResistance
+      ? {
+          icon: "shield",
+          title: `${clean(s.waterResistance)} splash resistant`,
+          text: "Fine for sweat, light rain and splashes. Not for bathing or swimming.",
+        }
+      : null,
+  ];
+  return list.filter(Boolean) as Feature[];
+}
+
+/** First paragraph of the description, plus an optional "Perfect for" list. */
+function intro(description: string) {
+  const paragraphs = description.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const perfect = paragraphs.find((p) => /^perfect for/i.test(p));
+  const uses = perfect
+    ?.split("\n")
+    .slice(1)
+    .map((l) => l.replace(/^[•\-\s]+/, "").trim())
+    .filter(Boolean);
+  return { lead: paragraphs[0], uses: uses ?? [] };
+}
+
+/** Section 4 — key features (the full specification list is kept in structured data for search). */
 export function Specifications({ product }: { product: PublicProduct }) {
-  const rows = ORDER.filter((k) => product.specs[k]).map((k) => [LABELS[k], product.specs[k]!] as const);
-  if (!rows.length && !product.description) return null;
+  const items = features(product.specs);
+  const { lead, uses } = intro(product.description || "");
+  if (!items.length && !lead) return null;
   const detailImage = product.images[2] ?? product.images[1] ?? product.images[0];
 
   return (
-    <section id="details" aria-labelledby="details-title" className="mx-auto w-full max-w-[1360px] px-5 py-20 sm:px-8 lg:px-12 lg:py-32">
-      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+    <section id="details" aria-labelledby="details-title" className="mx-auto w-full max-w-[1280px] px-4 py-16 sm:px-6 md:px-8 lg:px-10 lg:py-28">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <p className="label text-champagne-ink" data-reveal>
-            The details
+            Features
           </p>
-          <h2 id="details-title" className="display mt-5 text-[clamp(2.5rem,6vw,4.75rem)] text-ink" data-reveal>
-            Considered,
-            <br />
-            <span className="italic text-graphite">down to the millimetre.</span>
+          <h2 id="details-title" className="display mt-4 text-[clamp(2.25rem,5vw,4rem)] text-ink" data-reveal>
+            Made for <span className="italic text-graphite">every day.</span>
           </h2>
-          {product.description ? (
-            <p lang={langOf(product.description)} className="mt-7 max-w-md whitespace-pre-line leading-relaxed text-graphite" data-reveal>
-              {product.description}
+          {lead ? (
+            <p lang={langOf(lead)} className="mt-6 max-w-md leading-relaxed text-graphite" data-reveal>
+              {lead}
             </p>
           ) : null}
+          {uses.length ? (
+            <div className="mt-6" data-reveal>
+              <p className="text-sm font-semibold text-ink">Perfect for</p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {uses.map((u) => (
+                  <li key={u} lang={langOf(u)} className="rounded-full border border-rule bg-porcelain px-3.5 py-1.5 text-sm text-graphite">
+                    {u}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {detailImage ? (
-            <div className="relative mt-10 hidden aspect-[4/5] max-w-sm overflow-hidden rounded-[var(--radius-sm)] ring-1 ring-rule-soft lg:block">
+            <div className="relative mt-10 hidden aspect-[4/5] max-w-sm overflow-hidden rounded-[var(--radius-md)] ring-1 ring-rule-soft lg:block">
               <div className="absolute -inset-y-[8%] inset-x-0" data-parallax="40">
                 <Image
                   src={detailImage.url}
@@ -88,31 +115,31 @@ export function Specifications({ product }: { product: PublicProduct }) {
                   className="object-cover"
                 />
               </div>
-              {detailImage.placeholder ? (
-                <span className="label absolute bottom-3 left-3 bg-porcelain/85 px-2 py-1 text-[0.58rem] text-mist">
-                  Placeholder image
-                </span>
-              ) : null}
             </div>
           ) : null}
         </div>
 
-        {rows.length ? (
-          <div className="lg:col-span-7 lg:pt-4">
-            <dl className="border-t border-ink/80">
-              {rows.map(([label, value], i) => (
-                <div
-                  key={label}
-                  data-reveal
-                  data-reveal-delay={Math.min(i * 0.04, 0.3)}
-                  className="grid grid-cols-1 gap-1 border-b border-rule py-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-6"
-                >
-                  <dt className="label text-mist">{label}</dt>
-                  <dd className="num break-words font-serif text-xl text-ink sm:text-2xl">{value}</dd>
+        {items.length ? (
+          <ul className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:col-span-7 lg:pt-2">
+            {items.map((f, i) => (
+              <li
+                key={f.title}
+                data-reveal
+                data-reveal-delay={Math.min(i * 0.05, 0.3)}
+                className={`flex gap-4 rounded-[var(--radius-md)] bg-porcelain p-5 ring-1 ring-rule-soft sm:flex-col sm:gap-3 sm:p-6 ${
+                  items.length % 2 === 1 && i === items.length - 1 ? "sm:col-span-2 sm:flex-row sm:items-center sm:gap-5" : ""
+                }`}
+              >
+                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-champagne/15 text-champagne-ink">
+                  <Icon name={f.icon} size={20} />
+                </span>
+                <div>
+                  <h3 className="font-serif text-xl leading-tight text-ink sm:text-2xl">{f.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-graphite">{f.text}</p>
                 </div>
-              ))}
-            </dl>
-          </div>
+              </li>
+            ))}
+          </ul>
         ) : null}
       </div>
     </section>

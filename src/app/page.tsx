@@ -73,17 +73,17 @@ function StructuredData({ product, settings }: { product: PublicProduct; setting
   );
 }
 
-function PreviewNotice() {
-  return (
-    <div className="border-b border-white/10 bg-ink px-4 py-2.5 text-center text-xs leading-relaxed tracking-wide text-porcelain/85">
-      <span className="mr-2 inline-flex items-center gap-2 font-semibold uppercase tracking-[0.18em] text-champagne-soft">
-        <span aria-hidden className="size-1.5 rounded-full bg-champagne" />
-        Preview
-      </span>
-      Supplier photos and specifications are for reference; verify the received batch and set live pricing, stock and delivery details before publishing.
-    </div>
-  );
-}
+// function PreviewNotice() {
+//   return (
+//     <div className="border-b border-white/10 bg-ink px-4 py-2.5 text-center text-xs leading-relaxed tracking-wide text-porcelain/85">
+//       <span className="mr-2 inline-flex items-center gap-2 font-semibold uppercase tracking-[0.18em] text-champagne-soft">
+//         <span aria-hidden className="size-1.5 rounded-full bg-champagne" />
+//         Preview
+//       </span>
+//       Supplier photos and specifications are for reference; verify the received batch and set live pricing, stock and delivery details before publishing.
+//     </div>
+//   );
+// }
 
 function CollectionRail({ product, brandName }: { product: PublicProduct; brandName: string }) {
   const reference = product.specs.model || product.sku || product.variants[0]?.sku;
@@ -142,7 +142,7 @@ export default async function Home() {
       >
         Skip to content
       </a>
-      {product.isDemo || !connected ? <PreviewNotice /> : null}
+      {/* {product.isDemo || !connected ? <PreviewNotice /> : null} */}
       <Header brandName={settings.brandName} logoUrl={settings.logoUrl} announcement={settings.announcement} />
       <CollectionRail product={product} brandName={settings.brandName} />
       <main id="main" className="bg-ivory">

@@ -134,7 +134,7 @@ export function Hero() {
             href="#details"
             className="mt-7 inline-flex items-center gap-2 self-start text-sm font-semibold text-ink underline-offset-4 hover:underline"
           >
-            Full specifications
+            See all features
             <Icon name="arrow-right" size={14} className="rotate-90" />
           </a>
         </div>

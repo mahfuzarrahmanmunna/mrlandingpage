@@ -44,7 +44,7 @@ content, and order/enquiry submission returns "not available yet".
 | `AUTH_SECRET` | yes (for admin) | ≥ 32 random chars — `openssl rand -base64 48`. Also signs order-recovery tokens |
 | `NEXT_PUBLIC_SITE_URL` | yes in prod | Canonical origin (metadata, sitemap, admin origin check) |
 | `NEXT_PUBLIC_GTM_ID` | no | Google Tag Manager container ID (for example `GTM-ABC1234`); tracking is disabled when unset |
-| `IMAGE_HOSTS` | if using a CDN | Comma-separated hostnames for `next/image` (`res.cloudinary.com` is allowed by default) |
+| `IMAGE_HOSTS` | if using a CDN | Comma-separated hostnames for `next/image` (`res.cloudinary.com`, `i.ibb.co` and `i.ibb.co.com` are allowed by default) |
 | `IP_HASH_SALT` | recommended | Salt for hashed IPs used in rate limiting |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` | once | Only read by `npm run admin:create`; remove the password afterwards |
 
