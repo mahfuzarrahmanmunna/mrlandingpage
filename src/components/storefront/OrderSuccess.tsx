@@ -87,7 +87,7 @@ export function OrderSuccess({ order, onContinue }: { order: OrderConfirmation; 
         </div>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          <Button variant="secondary" onClick={onContinue} icon={<Icon name="arrow-left" size={16} />}>
+          <Button variant="secondary" onClick={onContinue} icon={<Icon name="arrow-left" size={16} />} className="whitespace-normal text-center">
             Continue viewing this watch
           </Button>
           <ContactActions compact />

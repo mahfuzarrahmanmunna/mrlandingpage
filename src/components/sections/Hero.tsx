@@ -4,81 +4,68 @@ import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { goToOrder } from "@/components/motion/scroll";
 import { Gallery } from "@/components/storefront/Gallery";
-import { ContactActions, PriceDisplay, StockStatus, VariantSwatches } from "@/components/storefront/PurchaseControls";
+import {
+  ContactActions,
+  PriceDisplay,
+  QuantityStepper,
+  StockStatus,
+  VariantSwatches,
+} from "@/components/storefront/PurchaseControls";
 import { useStorefront } from "@/components/storefront/StorefrontProvider";
-
-function DialRing() {
-  const ticks = Array.from({ length: 60 }, (_, i) => i);
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 400 400"
-      className="pointer-events-none absolute left-1/2 top-1/2 -z-10 w-[132%] max-w-none -translate-x-1/2 -translate-y-1/2 text-rule"
-    >
-      <g data-parallax-rotate="24" style={{ transformOrigin: "200px 200px", transformBox: "view-box" }}>
-        <circle cx="200" cy="200" r="196" fill="none" stroke="currentColor" strokeWidth="0.5" />
-        <circle cx="200" cy="200" r="178" fill="none" stroke="currentColor" strokeWidth="0.35" strokeDasharray="1 3" />
-        {ticks.map((i) => (
-          <line
-            key={i}
-            x1="200"
-            y1={i % 5 === 0 ? 6 : 10}
-            x2="200"
-            y2="16"
-            stroke={i % 15 === 0 ? "var(--champagne)" : "currentColor"}
-            strokeWidth={i % 5 === 0 ? 0.9 : 0.4}
-            transform={`rotate(${i * 6} 200 200)`}
-          />
-        ))}
-      </g>
-    </svg>
-  );
-}
+import { formatMoney } from "@/lib/format";
+import { langOf } from "@/lib/lang";
 
 export function Hero() {
-  const { product, settings, variant } = useStorefront();
-  const words = (settings.hero.headline || product.title).split(" ");
-  const last = words.pop();
+  const { product, settings, variant, quantity, subtotal } = useStorefront();
+  const title = settings.hero.headline || product.title;
+  const words = title.split(" ");
+  const last = words.length > 1 ? words.pop() : undefined;
   const soldOut = variant.stock < 1;
+  const trust = settings.trustHighlights.slice(0, 3);
 
   return (
-    <section id="top" aria-labelledby="hero-title" className="relative isolate overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-20">
-        <div className="absolute -right-[20%] -top-[30%] h-[80vmax] w-[80vmax] rounded-full bg-[radial-gradient(closest-side,rgba(217,195,155,0.32),transparent)]" />
-        <div className="absolute -left-[25%] bottom-[-40%] h-[60vmax] w-[60vmax] rounded-full bg-[radial-gradient(closest-side,rgba(167,163,155,0.16),transparent)]" />
+    <section id="top" aria-labelledby="hero-title" className="relative isolate">
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute -right-[15%] -top-[25%] h-[70vmax] w-[70vmax] rounded-full bg-[radial-gradient(closest-side,rgba(217,195,155,0.28),transparent)]" />
       </div>
 
-      <div className="mx-auto grid w-full max-w-[1360px] gap-8 px-5 pb-16 pt-4 sm:px-8 sm:pt-8 lg:grid-cols-12 lg:gap-12 lg:px-12 lg:pb-28 lg:pt-12">
-        <div className="relative lg:order-2 lg:col-span-7">
-          <div className="relative mx-auto max-w-[640px]">
-            <div className="absolute inset-0 hidden lg:block">
-              <DialRing />
-            </div>
+      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 gap-6 px-4 pb-12 pt-4 sm:gap-8 sm:px-6 sm:pt-6 md:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12 lg:px-10 lg:pb-20 lg:pt-10 xl:gap-16">
+        {/* Gallery — first on mobile, stays in view on desktop while details scroll. */}
+        <div className="min-w-0">
+          <div className="mx-auto w-full max-w-[560px] lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:max-w-none">
             <Gallery />
           </div>
         </div>
 
-        <div className="flex flex-col lg:order-1 lg:col-span-5 lg:pt-10">
+        {/* Details & purchase */}
+        <div className="mx-auto flex w-full min-w-0 max-w-[560px] flex-col lg:mx-0 lg:max-w-none lg:py-2">
           {settings.hero.eyebrow ? (
             <p className="label flex items-center gap-3 text-champagne-ink">
-              <span aria-hidden className="h-px w-8 bg-champagne" />
+              <span aria-hidden className="h-px w-6 bg-champagne" />
               {settings.hero.eyebrow}
             </p>
           ) : null}
 
-          <h1 id="hero-title" className="display mt-4 text-[clamp(3rem,11vw,6.75rem)] text-ink lg:mt-6">
-            {words.length ? <span className="block">{words.join(" ")}</span> : null}
-            <span className="block italic text-graphite">{last}</span>
+          <h1
+            id="hero-title"
+            className="display mt-3 text-balance text-[clamp(2.25rem,7vw,3.75rem)] leading-[1.02] text-ink"
+          >
+            {words.join(" ")}
+            {last ? <span className="italic text-graphite"> {last}</span> : null}
           </h1>
 
           {product.tagline ? (
-            <p className="mt-5 max-w-md font-serif text-xl leading-snug text-graphite sm:text-2xl">{product.tagline}</p>
+            <p lang={langOf(product.tagline)} className="mt-3 max-w-xl text-pretty text-lg leading-snug text-graphite sm:text-xl">
+              {product.tagline}
+            </p>
           ) : null}
           {settings.hero.subheadline ? (
-            <p className="mt-3 max-w-md text-[0.95rem] leading-relaxed text-mist">{settings.hero.subheadline}</p>
+            <p lang={langOf(settings.hero.subheadline)} className="mt-2 max-w-xl text-pretty text-[0.95rem] leading-relaxed text-mist">
+              {settings.hero.subheadline}
+            </p>
           ) : null}
 
-          <div className="mt-7 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-t border-rule pt-6">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-y border-rule py-4">
             <PriceDisplay />
             <StockStatus />
           </div>
@@ -87,28 +74,69 @@ export function Hero() {
             <VariantSwatches />
           </div>
 
-          <div id="hero-cta" className="mt-7 grid gap-2.5">
-            <Button
-              size="lg"
-              onClick={goToOrder}
-              disabled={soldOut}
-              icon={soldOut ? undefined : <Icon name="arrow-right" size={16} className="order-last transition-transform group-hover:translate-x-1" />}
-            >
-              {soldOut ? "This edition is unavailable" : "Order now"}
-            </Button>
+          <div id="hero-cta" className="mt-6 grid gap-3">
+            <div className="flex flex-wrap items-stretch gap-3">
+              <QuantityStepper id="hero-qty" />
+              <Button
+                size="lg"
+                onClick={goToOrder}
+                disabled={soldOut}
+                className="min-w-[9rem] flex-1 px-5"
+                icon={
+                  soldOut ? undefined : (
+                    <Icon name="arrow-right" size={16} className="order-last transition-transform group-hover:translate-x-1" />
+                  )
+                }
+              >
+                {soldOut ? "Sold out" : "Order now"}
+              </Button>
+            </div>
+            {quantity > 1 && !soldOut ? (
+              <p className="num text-sm text-graphite">
+                Subtotal for {quantity}:{" "}
+                <span className="font-semibold text-ink">{formatMoney(subtotal, settings.currency)}</span>
+              </p>
+            ) : null}
             <ContactActions />
+            {settings.codEnabled && !trust.some((t) => t.icon === "cash") ? (
+              <p className="flex items-center gap-2 text-sm text-graphite">
+                <Icon name="cash" size={18} className="text-champagne-ink" />
+                Cash on delivery — pay when the watch arrives.
+              </p>
+            ) : null}
           </div>
 
           {product.highlights.length ? (
-            <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-[0.8rem] text-graphite">
+            <ul className="mt-7 grid grid-cols-1 gap-2.5 rounded-[var(--radius-md)] bg-porcelain/80 p-4 ring-1 ring-rule-soft min-[420px]:grid-cols-2 sm:p-5">
               {product.highlights.map((h) => (
-                <li key={h} className="flex items-center gap-2">
-                  <span aria-hidden className="size-1 rounded-full bg-champagne" />
+                <li key={h} lang={langOf(h)} className="flex items-start gap-2.5 text-sm text-ink">
+                  <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-champagne/15 text-champagne-ink">
+                    <Icon name="check" size={13} strokeWidth={2} />
+                  </span>
                   {h}
                 </li>
               ))}
             </ul>
           ) : null}
+
+          {trust.length ? (
+            <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {trust.map((t) => (
+                <li key={t.title} className="flex items-center gap-2.5 text-[0.8rem] leading-snug text-graphite sm:flex-col sm:items-start sm:gap-1.5">
+                  <Icon name={t.icon} size={20} className="shrink-0 text-champagne-ink" />
+                  {t.title}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          <a
+            href="#details"
+            className="mt-7 inline-flex items-center gap-2 self-start text-sm font-semibold text-ink underline-offset-4 hover:underline"
+          >
+            Full specifications
+            <Icon name="arrow-right" size={14} className="rotate-90" />
+          </a>
         </div>
       </div>
     </section>

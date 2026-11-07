@@ -50,13 +50,22 @@ const specs = z.object({
   brand: optStr(80),
   model: optStr(80),
   sku: optStr(64),
+  powerSource: optStr(80),
+  caseShape: optStr(40),
   dialSize: optStr(40),
   caseMaterial: optStr(80),
   caseThickness: optStr(40),
   strapMaterial: optStr(80),
+  bandLength: optStr(40),
+  bandWidth: optStr(40),
+  clasp: optStr(80),
   movement: optStr(80),
+  display: optStr(40),
+  calendar: optStr(80),
+  luminous: optStr(40),
   waterResistance: optStr(40),
   glass: optStr(60),
+  origin: optStr(60),
   dialColor: optStr(60),
   color: optStr(60),
   warranty: optStr(120),
@@ -72,6 +81,10 @@ export const productSchema = z
     compareAtPrice: optMoney,
     sku: str(64).min(1, "SKU is required."),
     images: z.array(imageSchema).max(12),
+    videoUrl: urlOrPath
+      .refine((v) => v === "" || /\.(mp4|webm|ogg)(\?.*)?$/i.test(v), "Use an MP4, WebM or Ogg video URL.")
+      .optional()
+      .default(""),
     modelUrl: urlOrPath
       .refine((v) => v === "" || /\.(glb|gltf)(\?.*)?$/i.test(v), "3D model must be a .glb or .gltf file.")
       .optional()

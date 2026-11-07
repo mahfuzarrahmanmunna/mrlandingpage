@@ -6,38 +6,52 @@ import { Footer } from "@/components/sections/Footer";
 import { Header } from "@/components/sections/Header";
 import { Hero } from "@/components/sections/Hero";
 import { OrderSection } from "@/components/sections/OrderSection";
-import { PurchaseActions } from "@/components/sections/PurchaseActions";
 import { Specifications } from "@/components/sections/Specifications";
 import { TrustHighlights } from "@/components/sections/TrustHighlights";
 import { VariantSelector } from "@/components/sections/VariantSelector";
 import { WhyChoose } from "@/components/sections/WhyChoose";
 import { EnquiryForm } from "@/components/storefront/EnquiryForm";
+import { GoogleTagManager } from "@/components/storefront/GoogleTagManager";
 import { StickyBar } from "@/components/storefront/StickyBar";
+import { StorefrontAnalytics } from "@/components/storefront/StorefrontAnalytics";
 import { StorefrontProvider } from "@/components/storefront/StorefrontProvider";
-import { siteUrl } from "@/lib/env";
+import { absoluteUrl, jsonLd, keywords, organizationJsonLd, productJsonLd, seoDescription, seoTitle } from "@/lib/seo";
 import { getStorefront } from "@/lib/storefront";
 import type { PublicProduct, PublicSettings } from "@/lib/types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { product, settings } = await getStorefront();
-  const title = product?.seo.title || (product ? `${product.title} — ${settings.brandName}` : settings.brandName);
-  const description =
-    product?.seo.description || product?.tagline || settings.hero.subheadline || `${settings.brandName} watches.`;
-  const og = product?.seo.ogImage;
+  if (!product) {
+    return {
+      title: settings.brandName,
+      description: settings.hero.subheadline || `${settings.brandName} watches.`,
+      alternates: { canonical: "/" },
+      robots: { index: false, follow: true },
+    };
+  }
+  const title = seoTitle(product, settings);
+  const description = seoDescription(product, settings);
   return {
     title,
     description,
+    keywords: keywords(product, settings),
     alternates: { canonical: "/" },
+    category: "Watches",
     openGraph: {
       type: "website",
       url: "/",
       siteName: settings.brandName,
       title,
       description,
-      ...(og ? { images: [{ url: og }] } : {}),
+      locale: settings.currency.code === "BDT" ? "bn_BD" : "en_US",
+      alternateLocale: ["en_US"],
+      ...(product.videoUrl ? { videos: [{ url: absoluteUrl(product.videoUrl), type: "video/mp4" }] } : {}),
     },
     twitter: { card: "summary_large_image", title, description },
-    robots: product?.isDemo ? { index: false, follow: false } : undefined,
+    // Preview/demo content stays out of search until the owner publishes real data.
+    robots: product.isDemo
+      ? { index: false, follow: false }
+      : { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
   };
 }
 
@@ -47,43 +61,53 @@ async function copyrightYear() {
   return new Date().getFullYear();
 }
 
-function ProductJsonLd({ product, settings }: { product: PublicProduct; settings: PublicSettings }) {
-  // Only real product data; never emitted for preview/demo content.
-  if (product.isDemo) return null;
-  const base = siteUrl();
-  const abs = (u: string) => (u.startsWith("http") ? u : `${base}${u}`);
-  const realImages = product.images.filter((i) => !i.placeholder).map((i) => abs(i.url));
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.title,
-    description: product.description || product.tagline,
-    sku: product.sku,
-    ...(product.specs.brand ? { brand: { "@type": "Brand", name: product.specs.brand } } : {}),
-    ...(realImages.length ? { image: realImages } : {}),
-    offers: product.variants.map((v) => ({
-      "@type": "Offer",
-      sku: v.sku,
-      name: v.name,
-      price: v.price,
-      priceCurrency: settings.currency.code,
-      availability: v.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      url: `${base}/`,
-    })),
-  };
+function StructuredData({ product, settings }: { product: PublicProduct; settings: PublicSettings }) {
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
-    />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(organizationJsonLd(settings))} />
+      {/* Product data only for real listings — never for preview/demo content. */}
+      {product.isDemo ? null : (
+        <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(productJsonLd(product, settings))} />
+      )}
+    </>
   );
 }
 
 function PreviewNotice() {
   return (
-    <div className="bg-ink px-4 py-2 text-center text-[0.72rem] leading-relaxed tracking-wide text-porcelain/85">
-      Preview content — the product, images, prices and delivery fees shown are placeholders until the store owner
-      publishes real details.
+    <div className="border-b border-white/10 bg-ink px-4 py-2.5 text-center text-xs leading-relaxed tracking-wide text-porcelain/85">
+      <span className="mr-2 inline-flex items-center gap-2 font-semibold uppercase tracking-[0.18em] text-champagne-soft">
+        <span aria-hidden className="size-1.5 rounded-full bg-champagne" />
+        Preview
+      </span>
+      Supplier photos and specifications are for reference; verify the received batch and set live pricing, stock and delivery details before publishing.
+    </div>
+  );
+}
+
+function CollectionRail({ product, brandName }: { product: PublicProduct; brandName: string }) {
+  const reference = product.specs.model || product.sku || product.variants[0]?.sku;
+
+  return (
+    <div className="border-y border-rule-soft bg-porcelain/75">
+      <div className="mx-auto flex w-full max-w-[1360px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-3.5 sm:px-8 lg:px-12">
+        <p className="label flex items-center gap-2 text-mist">
+          <span aria-hidden className="size-1.5 rounded-full bg-champagne" />
+          {brandName}
+          <span aria-hidden className="text-rule">/</span>
+          Timepieces
+        </p>
+        <div className="flex items-center gap-5">
+          {reference ? (
+            <p className="label text-mist">
+              Reference <span className="ml-1.5 text-ink">{reference}</span>
+            </p>
+          ) : null}
+          <p className="label hidden text-mist sm:block">
+            {String(product.variants.length).padStart(2, "0")} {product.variants.length === 1 ? "edition" : "editions"}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -94,6 +118,7 @@ export default async function Home() {
   if (!product || product.variants.length === 0) {
     return (
       <>
+        <GoogleTagManager />
         <Header brandName={settings.brandName} logoUrl={settings.logoUrl} announcement={settings.announcement} />
         <main id="main" className="mx-auto grid min-h-[70vh] max-w-3xl place-items-center px-6 text-center">
           <div>
@@ -109,6 +134,8 @@ export default async function Home() {
 
   return (
     <StorefrontProvider product={product} settings={settings} connected={connected}>
+      <GoogleTagManager />
+      <StorefrontAnalytics />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-ink focus:px-4 focus:py-3 focus:text-porcelain"
@@ -117,9 +144,13 @@ export default async function Home() {
       </a>
       {product.isDemo || !connected ? <PreviewNotice /> : null}
       <Header brandName={settings.brandName} logoUrl={settings.logoUrl} announcement={settings.announcement} />
-      <main id="main">
-        <Hero />
-        <PurchaseActions />
+      <CollectionRail product={product} brandName={settings.brandName} />
+      <main id="main" className="bg-ivory">
+        <div className="relative isolate overflow-x-clip bg-[radial-gradient(ellipse_at_72%_30%,rgba(217,195,155,0.2),transparent_38%),linear-gradient(180deg,#fbf9f4_0%,#f6f2ea_68%,#eee7da_150%)]">
+          <div className="relative z-10">
+            <Hero />
+          </div>
+        </div>
         <TrustHighlights items={settings.trustHighlights} />
         <Specifications product={product} />
         <VariantSelector />
@@ -130,7 +161,7 @@ export default async function Home() {
       <Footer settings={settings} year={year} enquiry={<EnquiryForm />} />
       <StickyBar />
       <MotionProvider />
-      <ProductJsonLd product={product} settings={settings} />
+      <StructuredData product={product} settings={settings} />
     </StorefrontProvider>
   );
 }

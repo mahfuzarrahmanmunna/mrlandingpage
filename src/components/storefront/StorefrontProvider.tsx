@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, use, useCallback, useMemo, useState, type ReactNode } from "react";
+import { analyticsItem, trackEcommerceEvent } from "@/lib/analytics";
 import { clampQuantity } from "@/lib/pricing";
 import type { PublicProduct, PublicSettings, PublicVariant } from "@/lib/types";
 
@@ -47,7 +48,21 @@ export function StorefrontProvider({
   const maxQuantity = Math.max(0, Math.min(variant.stock, settings.maxQuantityPerOrder));
   const quantity = clampQuantity(rawQuantity, variant.stock, settings.maxQuantityPerOrder) || 1;
 
-  const setVariantKey = useCallback((key: string) => setVariantKeyState(key), []);
+  const setVariantKey = useCallback(
+    (key: string) => {
+      if (key === variantKey) return;
+      setVariantKeyState(key);
+      const selected = product.variants.find((candidate) => candidate.key === key);
+      if (connected && !product.isDemo && selected) {
+        trackEcommerceEvent("select_item", {
+          item_list_id: "editions",
+          item_list_name: "Watch editions",
+          items: [analyticsItem(product, selected)],
+        });
+      }
+    },
+    [connected, product, variantKey],
+  );
   const setQuantity = useCallback((q: number) => setRawQuantity(q), []);
 
   const applyStock = useCallback((key: string, stock: number) => {

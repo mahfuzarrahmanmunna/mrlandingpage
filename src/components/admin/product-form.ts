@@ -16,13 +16,22 @@ export const SPEC_FIELDS = [
   ["brand", "Brand"],
   ["model", "Model"],
   ["sku", "Reference / SKU"],
+  ["powerSource", "Power source"],
+  ["caseShape", "Case shape"],
   ["dialSize", "Case diameter (e.g. 40 mm)"],
   ["caseThickness", "Case thickness"],
   ["caseMaterial", "Case material"],
   ["strapMaterial", "Strap / bracelet"],
+  ["bandLength", "Band length"],
+  ["bandWidth", "Band width"],
+  ["clasp", "Clasp"],
   ["movement", "Movement"],
+  ["display", "Display"],
+  ["calendar", "Calendar"],
+  ["luminous", "Luminous"],
   ["waterResistance", "Water resistance"],
   ["glass", "Crystal / glass"],
+  ["origin", "Origin"],
   ["dialColor", "Dial colour"],
   ["color", "Colour"],
   ["warranty", "Warranty (only if confirmed)"],
@@ -37,6 +46,7 @@ export type ProductForm = {
   compareAtPrice: number | string;
   sku: string;
   images: Img[];
+  videoUrl: string;
   modelUrl: string;
   specs: Record<string, string>;
   variantLabel: string;
@@ -60,6 +70,7 @@ export function toProductForm(p: any | null): ProductForm {
     compareAtPrice: p?.compareAtPrice ?? "",
     sku: p?.sku ?? "",
     images: imgs(p?.images),
+    videoUrl: p?.videoUrl ?? "",
     modelUrl: p?.modelUrl ?? "",
     specs: Object.fromEntries(SPEC_FIELDS.map(([k]) => [k, p?.specs?.[k] ?? ""])),
     variantLabel: p?.variantLabel ?? "Edition",
@@ -82,4 +93,3 @@ export function toProductForm(p: any | null): ProductForm {
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
-

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { Suspense, useState, type ReactNode } from "react";
 
 const NAV = [
   { href: "/admin", label: "Overview" },
@@ -12,8 +12,34 @@ const NAV = [
   { href: "/admin/settings", label: "Store settings" },
 ];
 
+function NavLinks({ pathname }: { pathname: string | null }) {
+  const isActive = (href: string) =>
+    pathname !== null && (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
+  return (
+    <ul className="flex gap-1 lg:flex-col">
+      {NAV.map((n) => (
+        <li key={n.href}>
+          <Link
+            href={n.href}
+            aria-current={isActive(n.href) ? "page" : undefined}
+            className={`flex min-h-10 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-3 text-sm transition ${
+              isActive(n.href) ? "bg-ink text-porcelain" : "text-graphite hover:bg-linen hover:text-ink"
+            }`}
+          >
+            {n.label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Reads the URL, so it lives behind its own Suspense boundary (required on dynamic routes). */
+function ActiveNavLinks() {
+  return <NavLinks pathname={usePathname()} />;
+}
+
 export function AdminShell({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -23,8 +49,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
     router.replace("/admin/login");
     router.refresh();
   }
-
-  const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
 
   return (
     <div className="min-h-dvh bg-ivory lg:grid lg:grid-cols-[240px_1fr]">
@@ -39,21 +63,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </button>
         </div>
         <nav aria-label="Admin" className="overflow-x-auto px-3 pb-3 lg:px-3">
-          <ul className="flex gap-1 lg:flex-col">
-            {NAV.map((n) => (
-              <li key={n.href}>
-                <Link
-                  href={n.href}
-                  aria-current={isActive(n.href) ? "page" : undefined}
-                  className={`flex min-h-10 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-3 text-sm transition ${
-                    isActive(n.href) ? "bg-ink text-porcelain" : "text-graphite hover:bg-linen hover:text-ink"
-                  }`}
-                >
-                  {n.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <Suspense fallback={<NavLinks pathname={null} />}>
+            <ActiveNavLinks />
+          </Suspense>
         </nav>
         <div className="hidden px-6 lg:absolute lg:bottom-6 lg:block">
           <a href="/" target="_blank" className="block text-sm text-graphite hover:text-ink">

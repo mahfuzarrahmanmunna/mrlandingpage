@@ -31,7 +31,7 @@ export function VariantSelector() {
               )}
             </h2>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <span className="label text-mist">Quantity</span>
             <QuantityStepper id="editions-qty" />
             <span className="num font-serif text-2xl text-ink" aria-live="polite">

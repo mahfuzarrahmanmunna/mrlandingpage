@@ -31,19 +31,27 @@ function useReducedMotion() {
   return reduced;
 }
 
+type Mode = "photo" | "3d" | "video";
+
+const thumbBase =
+  "relative size-16 shrink-0 snap-start overflow-hidden rounded-[var(--radius-md)] bg-linen transition sm:size-[4.5rem]";
+const thumbState = (active: boolean) =>
+  active ? "ring-2 ring-ink ring-offset-2 ring-offset-ivory" : "opacity-75 ring-1 ring-rule hover:opacity-100";
+
 export function Gallery() {
   const { product, settings, images, variant } = useStorefront();
   const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState<"photo" | "3d">("photo");
+  const [mode, setMode] = useState<Mode>("photo");
   const [failed3D, setFailed3D] = useState(false);
   const reducedMotion = useReducedMotion();
   const pointer = useRef<{ x: number; y: number; id: number } | null>(null);
 
-  // Reset to first image whenever the variant (and so the image set) changes.
+  // Reset to the first photo whenever the variant (and so the image set) changes.
   const [lastVariant, setLastVariant] = useState(variant.key);
   if (lastVariant !== variant.key) {
     setLastVariant(variant.key);
     setIndex(0);
+    setMode("photo");
   }
 
   const count = images.length;
@@ -53,6 +61,7 @@ export function Gallery() {
   const go = useCallback(
     (dir: 1 | -1) => {
       if (count < 2) return;
+      setMode("photo");
       setIndex((i) => (i + dir + count) % count);
     },
     [count],
@@ -64,7 +73,7 @@ export function Gallery() {
   }, []);
 
   if (!current) {
-    return <div className="aspect-[4/5] w-full bg-linen" aria-label="No product image available" role="img" />;
+    return <div className="aspect-square w-full bg-linen" aria-label="No product image available" role="img" />;
   }
 
   return (
@@ -85,7 +94,7 @@ export function Gallery() {
       }}
     >
       <div
-        className="paper relative aspect-square w-full touch-pan-y sm:aspect-[4/5] overflow-hidden rounded-[var(--radius-sm)] ring-1 ring-rule-soft"
+        className="paper relative aspect-square w-full touch-pan-y overflow-hidden rounded-[var(--radius-md)] bg-linen ring-1 ring-rule-soft"
         onPointerDown={(e) => {
           if (mode !== "photo" || e.pointerType === "mouse") return;
           pointer.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
@@ -104,7 +113,7 @@ export function Gallery() {
           images.map((img, i) => (
             <div
               key={`${variant.key}-${img.url}-${i}`}
-              className={`absolute inset-0 transition-[opacity,transform] duration-700 ease-out ${
+              className={`absolute inset-0 transition-[opacity,transform] duration-500 ease-out ${
                 i === index ? "scale-100 opacity-100" : "pointer-events-none scale-[1.02] opacity-0"
               }`}
               aria-hidden={i !== index}
@@ -113,7 +122,7 @@ export function Gallery() {
                 src={img.url}
                 alt={img.alt}
                 fill
-                sizes="(min-width: 1280px) 46vw, (min-width: 1024px) 52vw, 100vw"
+                sizes="(min-width: 1024px) 50vw, 100vw"
                 priority={i === 0}
                 loading={i === 0 ? undefined : "lazy"}
                 unoptimized={isSvg(img.url)}
@@ -122,6 +131,20 @@ export function Gallery() {
               />
             </div>
           ))
+        ) : mode === "video" && product.videoUrl ? (
+          <video
+            key={product.videoUrl}
+            className="absolute inset-0 size-full bg-ink object-contain"
+            controls
+            autoPlay
+            muted
+            playsInline
+            preload="metadata"
+            poster={current.url}
+          >
+            <source src={product.videoUrl} type="video/mp4" />
+            Your browser does not support video playback.
+          </video>
         ) : (
           <WatchViewer
             modelUrl={product.modelUrl}
@@ -132,69 +155,96 @@ export function Gallery() {
         )}
 
         {mode === "photo" && current.placeholder ? (
-          <span className="label absolute left-3 top-3 rounded-[var(--radius-sm)] bg-porcelain/85 px-2.5 py-1.5 text-[0.58rem] text-mist backdrop-blur-sm">
+          <span className="label absolute left-3 top-3 rounded-full bg-porcelain/90 px-3 py-1.5 text-[0.58rem] text-mist backdrop-blur-sm">
             Placeholder image
           </span>
         ) : null}
         {mode === "3d" && !product.modelUrl ? (
-          <span className="label absolute left-3 top-3 max-w-[70%] rounded-[var(--radius-sm)] bg-porcelain/85 px-2.5 py-1.5 text-[0.58rem] leading-relaxed text-mist backdrop-blur-sm">
+          <span className="label absolute left-3 top-3 max-w-[75%] rounded-[var(--radius-md)] bg-porcelain/90 px-3 py-1.5 text-[0.58rem] leading-relaxed text-mist backdrop-blur-sm">
             Illustrative 3D preview — not the actual product
           </span>
         ) : null}
 
         {mode === "photo" && count > 1 ? (
-          <div className="absolute inset-x-3 bottom-3 flex items-center justify-between">
+          <>
+            <p
+              className="num absolute right-3 top-3 rounded-full bg-ink/70 px-2.5 py-1 text-[0.7rem] font-semibold text-porcelain backdrop-blur"
+              aria-live="polite"
+            >
+              {index + 1} / {count}
+            </p>
             <button
               type="button"
               onClick={() => go(-1)}
-              className="grid size-11 place-items-center rounded-full bg-porcelain/90 text-ink shadow-soft backdrop-blur transition hover:bg-porcelain"
+              className="absolute left-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-porcelain/90 text-ink shadow-soft backdrop-blur transition hover:bg-porcelain"
               aria-label="Previous image"
             >
               <Icon name="chevron-left" />
             </button>
-            <p className="num label rounded-full bg-porcelain/80 px-3 py-1.5 text-graphite backdrop-blur" aria-live="polite">
-              {String(index + 1).padStart(2, "0")} <span className="text-steel">/ {String(count).padStart(2, "0")}</span>
-            </p>
             <button
               type="button"
               onClick={() => go(1)}
-              className="grid size-11 place-items-center rounded-full bg-porcelain/90 text-ink shadow-soft backdrop-blur transition hover:bg-porcelain"
+              className="absolute right-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-porcelain/90 text-ink shadow-soft backdrop-blur transition hover:bg-porcelain"
               aria-label="Next image"
             >
               <Icon name="chevron-right" />
             </button>
-          </div>
+          </>
         ) : null}
       </div>
 
-      <div className="mt-3 flex items-center gap-2">
-        {mode === "photo" && count > 1 ? (
-          <div className="flex gap-2" role="group" aria-label="Choose image">
-            {images.map((img, i) => (
-              <button
-                key={`${img.url}-${i}`}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`Show image ${i + 1} of ${count}`}
-                aria-current={i === index}
-                className={`relative size-14 overflow-hidden rounded-[var(--radius-sm)] bg-linen transition sm:size-16 ${
-                  i === index ? "ring-1 ring-ink ring-offset-2 ring-offset-ivory" : "opacity-70 ring-1 ring-rule hover:opacity-100"
-                }`}
-              >
-                <Image src={img.url} alt="" fill sizes="64px" unoptimized={isSvg(img.url)} className="object-cover" />
-              </button>
-            ))}
-          </div>
+      {/* One scrollable strip for every view: photos, video and 3D. Never wraps. */}
+      <div
+        className="-mx-1 mt-3 flex snap-x gap-2.5 overflow-x-auto px-1 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="group"
+        aria-label="Choose view"
+      >
+        {images.map((img, i) => (
+          <button
+            key={`${img.url}-${i}`}
+            type="button"
+            onClick={() => {
+              setMode("photo");
+              setIndex(i);
+            }}
+            aria-label={`Show image ${i + 1} of ${count}`}
+            aria-current={mode === "photo" && i === index}
+            className={`${thumbBase} ${thumbState(mode === "photo" && i === index)}`}
+          >
+            <Image src={img.url} alt="" fill sizes="72px" unoptimized={isSvg(img.url)} className="object-cover" />
+          </button>
+        ))}
+        {product.videoUrl ? (
+          <button
+            type="button"
+            onClick={() => setMode("video")}
+            aria-pressed={mode === "video"}
+            aria-label="Play product video"
+            className={`${thumbBase} ${thumbState(mode === "video")}`}
+          >
+            <Image src={images[0]!.url} alt="" fill sizes="72px" unoptimized={isSvg(images[0]!.url)} className="object-cover" />
+            <span className="absolute inset-0 grid place-items-center bg-ink/45 text-porcelain">
+              <span className="grid size-8 place-items-center rounded-full bg-porcelain/95 text-ink">
+                <Icon name="play" size={14} strokeWidth={0} className="fill-current" />
+              </span>
+            </span>
+            <span className="absolute inset-x-0 bottom-0 bg-ink/70 py-0.5 text-center text-[0.55rem] font-semibold uppercase tracking-wider text-porcelain">
+              Video
+            </span>
+          </button>
         ) : null}
         {can3D ? (
           <button
             type="button"
-            onClick={() => setMode((m) => (m === "photo" ? "3d" : "photo"))}
+            onClick={() => setMode("3d")}
             aria-pressed={mode === "3d"}
-            className="label ml-auto inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] border border-rule px-3.5 text-graphite transition hover:border-ink hover:text-ink"
+            aria-label={product.modelUrl ? "View in 3D" : "Show illustrative 3D preview"}
+            className={`${thumbBase} grid place-items-center bg-porcelain text-graphite ${thumbState(mode === "3d")}`}
           >
-            <Icon name={mode === "photo" ? "cube" : "image"} size={16} />
-            {mode === "photo" ? (product.modelUrl ? "View in 3D" : "3D preview") : "Back to photos"}
+            <span className="flex flex-col items-center gap-1">
+              <Icon name="cube" size={22} />
+              <span className="text-[0.6rem] font-semibold uppercase tracking-wider">3D</span>
+            </span>
           </button>
         ) : null}
       </div>

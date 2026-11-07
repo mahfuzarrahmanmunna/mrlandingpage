@@ -194,7 +194,7 @@ export default function WatchViewer({ modelUrl, dialColor, onFail, reducedMotion
       <ViewerBoundary onFail={onFail}>
         <Canvas
           dpr={[1, 1.75]}
-          camera={{ position: [0, 0, 6.2], fov: 32 }}
+          camera={{ position: [0, 0, 11], fov: 30 }}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
@@ -216,7 +216,7 @@ export default function WatchViewer({ modelUrl, dialColor, onFail, reducedMotion
               <Lightformer form="ring" color="#f3e3c4" intensity={1.4} position={[0, 0, -6]} scale={4} />
             </Environment>
           </Suspense>
-          <ContactShadows position={[0, -2.35, 0]} opacity={0.32} scale={8} blur={2.6} far={4} />
+          <ContactShadows position={[0, -3.1, 0]} opacity={0.32} scale={8} blur={2.6} far={4} />
           <OrbitControls
             enablePan={false}
             enableZoom={false}
@@ -234,5 +234,9 @@ export default function WatchViewer({ modelUrl, dialColor, onFail, reducedMotion
 
 function SceneContents({ modelUrl, dialColor, reducedMotion }: { modelUrl?: string; dialColor?: string; reducedMotion: boolean }) {
   if (modelUrl) return <GLBModel url={modelUrl} />;
-  return <ProceduralWatch dialColor={dialColor} animate={!reducedMotion} />;
+  return (
+    <group scale={0.95}>
+      <ProceduralWatch dialColor={dialColor} animate={!reducedMotion} />
+    </group>
+  );
 }

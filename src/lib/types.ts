@@ -16,13 +16,22 @@ export type SpecKey =
   | "brand"
   | "model"
   | "sku"
+  | "powerSource"
+  | "caseShape"
   | "dialSize"
   | "caseMaterial"
   | "caseThickness"
   | "strapMaterial"
+  | "bandLength"
+  | "bandWidth"
+  | "clasp"
   | "movement"
+  | "display"
+  | "calendar"
+  | "luminous"
   | "waterResistance"
   | "glass"
+  | "origin"
   | "dialColor"
   | "color"
   | "warranty";
@@ -51,6 +60,7 @@ export type PublicProduct = {
   compareAtPrice?: number;
   sku: string;
   images: ProductImage[];
+  videoUrl?: string;
   modelUrl?: string;
   specs: ProductSpecs;
   variants: PublicVariant[];
@@ -58,6 +68,8 @@ export type PublicProduct = {
   highlights: string[];
   seo: { title?: string; description?: string; ogImage?: string };
   isDemo: boolean;
+  /** ISO timestamp of the last product edit (absent for preview content). */
+  updatedAt?: string;
 };
 
 export type IconName =

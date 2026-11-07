@@ -2,9 +2,9 @@
  * PREVIEW CONTENT — NOT REAL PRODUCT DATA.
  *
  * Used when the database is not connected, and by `npm run seed` to create a
- * starting product the owner then edits in /admin. Every image is an
- * illustrated placeholder (flagged `placeholder: true`), and the product is
- * flagged `isDemo: true` so the public page shows a "preview content" notice.
+ * starting product the owner then edits in /admin. Product imagery and listed
+ * specifications are supplied examples; seller-dependent details and price
+ * still need confirmation before the product is published.
  *
  * Deliberately left empty (owner must supply): phone, WhatsApp, warranty,
  * water resistance, return policy, testimonials, ratings, announcement.
@@ -12,79 +12,103 @@
 import type { PublicProduct, PublicSettings } from "./types";
 
 const img = (file: string, alt: string) => ({
-  url: `/placeholder/${file}`,
+  url: `/images/${file}`,
   alt,
-  placeholder: true,
-  width: 1200,
-  height: 1500,
+  placeholder: false,
 });
 
 export const demoProduct: PublicProduct & { status: "active" } = {
   id: "demo",
-  slug: "imperial-meridian",
-  title: "Imperial Meridian",
-  tagline: "A quiet, architectural dress watch for everyday ceremony.",
-  description:
-    "Preview description. Replace this text in the admin dashboard with the real story of the watch: what it is made of, how it wears, and who it is for. Keep claims factual — materials, dimensions and movement as specified by the manufacturer.",
+  slug: "poedagar-930",
+  title: "POEDAGAR 930",
+  tagline: "Premium Men's Business Watch — একটি ঘড়ি, আপনার প্রতিদিনের স্টাইলে নতুন মাত্রা!",
+  description: [
+    "POEDAGAR 930 একটি স্টাইলিশ Men's Fashion Watch — Business, Office, Casual এবং Party Wear-এর সঙ্গে মানানসই। আপনার ব্যক্তিত্বে যোগ করুন স্মার্টনেস ও আভিজাত্যের ছোঁয়া!",
+    "প্রধান ফিচারসমূহ:\n• Premium-looking Stainless Steel Bracelet\n• Stylish Round Dial Design\n• Quartz Battery Movement\n• Day & Date Display\n• Luminous Hands\n• Hardlex Glass (Supplier specification অনুযায়ী)\n• Adjustable Metal Strap\n• 3 ATM Splash Resistance\n• Elegant Business & Casual Look",
+    "Perfect For:\n• Office & Business Meetings\n• Daily Wear\n• Casual Outfits\n• Birthday & Special Gifts",
+    "Water Resistance (3 ATM / 30 m): ঘাম, হালকা বৃষ্টি ও সাধারণ পানির ছিটা সাধারণত ঠিক আছে। হাত ধোয়ার সময় খুলে রাখা ভালো। গোসল, সুইমিং ও ডাইভিং — না। 3 ATM মানে ৩০ মিটার পানির নিচে ব্যবহারযোগ্য নয়।",
+    "দ্রষ্টব্য: বিভিন্ন বিক্রেতার স্পেসিফিকেশনে Case Material, Glass ও Band Width নিয়ে অমিল রয়েছে; চূড়ান্ত তথ্য হাতে আসা ব্যাচ অনুযায়ী।",
+    "একটি ঘড়ি, আপনার প্রতিদিনের স্টাইলে নতুন মাত্রা!",
+  ].join("\n\n"),
   price: 8900,
-  sku: "MRI-MER-001",
+  sku: "POE-930",
   images: [
-    img("meridian-ivory.svg", "Imperial Meridian with ivory dial, front view (placeholder illustration)"),
-    img("meridian-angle.svg", "Imperial Meridian three-quarter view (placeholder illustration)"),
-    img("meridian-detail.svg", "Imperial Meridian dial detail (placeholder illustration)"),
+    img("poydagar-blue.jpeg", "POEDAGAR 930 with blue dial"),
+    img("poydagar-white.jpeg", "POEDAGAR 930 with white dial"),
+    img("poydagar-black.jpeg", "POEDAGAR 930 with black dial"),
+    img("product-parameters.jpeg", "Supplier-listed POEDAGAR 930 size and product specifications"),
+    img("water-proof-display.jpeg", "POEDAGAR 930 3 ATM water resistance guide"),
   ],
   specs: {
-    brand: "MR Imperial",
-    model: "Meridian",
-    sku: "MRI-MER-001",
-    dialSize: "40 mm",
-    caseMaterial: "Stainless steel",
-    strapMaterial: "Steel bracelet / leather (by edition)",
+    brand: "POEDAGAR",
+    model: "930",
+    sku: "POE-930",
+    powerSource: "Battery",
+    caseShape: "Round",
+    dialSize: "প্রায় 40 mm",
+    caseThickness: "প্রায় 11 mm",
+    caseMaterial: "Stainless steel / alloy (বিক্রেতা-নির্ভর)",
+    strapMaterial: "Stainless steel (তালিকাভুক্ত)",
+    bandLength: "প্রায় 230 mm",
+    bandWidth: "22–26 mm (তালিকা অনুযায়ী)",
+    clasp: "Push button hidden clasp",
     movement: "Quartz",
-    glass: "Mineral crystal",
-    color: "By edition",
+    display: "Analog",
+    calendar: "Day & Date",
+    luminous: "হ্যাঁ (তালিকাভুক্ত)",
+    waterResistance: "3 ATM / 30 m — ছিটা সহনীয়; সাঁতার নয়",
+    glass: "Hardlex (তালিকাভুক্ত; ব্যাচে যাচাই করুন)",
+    origin: "China",
+    dialColor: "Blue / white / black",
+    color: "Blue, white and black dial variants",
   },
-  variantLabel: "Edition",
+  videoUrl: "/video/poydagar-video.mp4",
+  variantLabel: "Dial colour",
   variants: [
     {
-      key: "ivory-steel",
-      name: "Ivory · Steel",
-      sku: "MRI-MER-IVS",
+      key: "blue",
+      name: "Blue",
+      sku: "POE-930-BLU",
       price: 8900,
       stock: 12,
-      swatch: "#efe7d8",
+      swatch: "#1d5b7a",
       images: [
-        img("meridian-ivory.svg", "Ivory dial, steel bracelet (placeholder illustration)"),
-        img("meridian-angle.svg", "Three-quarter view (placeholder illustration)"),
-        img("meridian-detail.svg", "Dial detail (placeholder illustration)"),
+        img("poydagar-blue.jpeg", "POEDAGAR 930 with blue dial"),
+        img("product-parameters.jpeg", "Supplier-listed POEDAGAR 930 size and product specifications"),
+        img("water-proof-display.jpeg", "POEDAGAR 930 3 ATM water resistance guide"),
       ],
       available: true,
     },
     {
-      key: "midnight-leather",
-      name: "Midnight · Leather",
-      sku: "MRI-MER-MDL",
+      key: "white",
+      name: "White",
+      sku: "POE-930-WHT",
       price: 9400,
       stock: 6,
-      swatch: "#1f2430",
+      swatch: "#dedbd4",
       images: [
-        img("meridian-midnight.svg", "Midnight dial, leather strap (placeholder illustration)"),
-        img("meridian-angle.svg", "Three-quarter view (placeholder illustration)"),
+        img("poydagar-white.jpeg", "POEDAGAR 930 with white dial"),
+        img("product-parameters.jpeg", "Supplier-listed POEDAGAR 930 size and product specifications"),
+        img("water-proof-display.jpeg", "POEDAGAR 930 3 ATM water resistance guide"),
       ],
       available: true,
     },
     {
-      key: "champagne-two-tone",
-      name: "Champagne · Two-tone",
-      sku: "MRI-MER-CHT",
+      key: "black",
+      name: "Black",
+      sku: "POE-930-BLK",
       price: 10900,
       stock: 0,
-      swatch: "#cdb07a",
-      images: [img("meridian-champagne.svg", "Champagne dial, two-tone bracelet (placeholder illustration)")],
+      swatch: "#252525",
+      images: [
+        img("poydagar-black.jpeg", "POEDAGAR 930 with black dial"),
+        img("product-parameters.jpeg", "Supplier-listed POEDAGAR 930 size and product specifications"),
+        img("water-proof-display.jpeg", "POEDAGAR 930 3 ATM water resistance guide"),
+      ],
       available: false,
     },
   ],
-  highlights: ["40 mm case", "Quartz movement", "Three editions"],
+  highlights: ["প্রায় 40 mm কেস", "Quartz movement", "Day & Date", "3 ATM splash resistance"],
   seo: {},
   isDemo: true,
   status: "active",
@@ -93,8 +117,8 @@ export const demoProduct: PublicProduct & { status: "active" } = {
 export const demoSettings: PublicSettings = {
   brandName: "MR Imperial",
   hero: {
-    eyebrow: "The Meridian Collection",
-    subheadline: "Clean proportions, a sunray dial and a case that sits close to the wrist.",
+    eyebrow: "POEDAGAR 930",
+    subheadline: "কোয়ার্টজ মুভমেন্ট, Day & Date ডিসপ্লে এবং Stainless Steel ব্রেসলেট।",
   },
   currency: { code: "BDT", symbol: "৳" },
   contact: {},

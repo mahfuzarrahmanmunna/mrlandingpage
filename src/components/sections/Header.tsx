@@ -69,7 +69,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
                 <li key={n.href}>
                   <a
                     href={n.href}
-                    className="label relative py-2 text-graphite transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-500 hover:text-ink hover:after:scale-x-100"
+                    className="label relative inline-flex min-h-11 items-center text-graphite transition-colors after:absolute after:inset-x-0 after:bottom-2.5 after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-500 hover:text-ink hover:after:scale-x-100"
                   >
                     {n.label}
                   </a>

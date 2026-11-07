@@ -24,6 +24,7 @@ export const PUT = withAdmin(async (req) => {
   const clean = {
     ...data,
     compareAtPrice: data.compareAtPrice ?? undefined,
+    videoUrl: data.videoUrl || undefined,
     modelUrl: data.modelUrl || undefined,
     variants: data.variants.map((v) => ({ ...v, compareAtPrice: v.compareAtPrice ?? undefined, swatch: v.swatch || undefined })),
     highlights: data.highlights.filter(Boolean),
@@ -35,7 +36,14 @@ export const PUT = withAdmin(async (req) => {
     const saved = existing
       ? await Product.findByIdAndUpdate(
           existing._id,
-          { $set: clean, $unset: { ...(clean.compareAtPrice === undefined ? { compareAtPrice: 1 } : {}), ...(clean.modelUrl ? {} : { modelUrl: 1 }) } },
+          {
+            $set: clean,
+            $unset: {
+              ...(clean.compareAtPrice === undefined ? { compareAtPrice: 1 } : {}),
+              ...(clean.videoUrl ? {} : { videoUrl: 1 }),
+              ...(clean.modelUrl ? {} : { modelUrl: 1 }),
+            },
+          },
           { returnDocument: "after", runValidators: true },
         ).lean()
       : (await Product.create(clean)).toObject();

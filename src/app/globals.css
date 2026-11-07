@@ -52,8 +52,8 @@
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
 
-  --font-serif: var(--font-display), "Cormorant Garamond", Georgia, serif;
-  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display), var(--font-bengali), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-body), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
 
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);

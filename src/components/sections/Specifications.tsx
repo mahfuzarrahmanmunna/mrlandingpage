@@ -1,17 +1,27 @@
 import Image from "next/image";
+import { langOf } from "@/lib/lang";
 import type { PublicProduct, SpecKey } from "@/lib/types";
 
 const LABELS: Record<SpecKey, string> = {
   brand: "Brand",
   model: "Model",
   sku: "Reference / SKU",
+  powerSource: "Power source",
+  caseShape: "Case shape",
   dialSize: "Case diameter",
   caseThickness: "Case thickness",
   caseMaterial: "Case material",
   strapMaterial: "Strap / bracelet",
+  bandLength: "Band length",
+  bandWidth: "Band width",
+  clasp: "Clasp",
   movement: "Movement",
+  display: "Display",
+  calendar: "Calendar",
+  luminous: "Luminous",
   waterResistance: "Water resistance",
   glass: "Crystal",
+  origin: "Origin",
   dialColor: "Dial",
   color: "Colour",
   warranty: "Warranty",
@@ -21,13 +31,22 @@ const ORDER: SpecKey[] = [
   "brand",
   "model",
   "sku",
+  "powerSource",
+  "caseShape",
   "dialSize",
   "caseThickness",
   "caseMaterial",
   "strapMaterial",
+  "bandLength",
+  "bandWidth",
+  "clasp",
   "movement",
+  "display",
+  "calendar",
+  "luminous",
   "waterResistance",
   "glass",
+  "origin",
   "dialColor",
   "color",
   "warranty",
@@ -52,7 +71,7 @@ export function Specifications({ product }: { product: PublicProduct }) {
             <span className="italic text-graphite">down to the millimetre.</span>
           </h2>
           {product.description ? (
-            <p className="mt-7 max-w-md whitespace-pre-line leading-relaxed text-graphite" data-reveal>
+            <p lang={langOf(product.description)} className="mt-7 max-w-md whitespace-pre-line leading-relaxed text-graphite" data-reveal>
               {product.description}
             </p>
           ) : null}

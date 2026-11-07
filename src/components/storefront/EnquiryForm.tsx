@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { captureAttribution } from "@/lib/attribution";
+import { trackEvent } from "@/lib/analytics";
 import { fieldErrors, leadRequestSchema } from "@/lib/validation/order";
 import { TextArea, TextField } from "./Field";
 import { useStorefront } from "./StorefrontProvider";
@@ -47,6 +48,7 @@ export function EnquiryForm() {
       });
       const data = await res.json().catch(() => null);
       if (res.ok) {
+        trackEvent("generate_lead", { lead_type: "callback_request", item_name: product.title });
         setState("sent");
         return;
       }

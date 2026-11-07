@@ -120,6 +120,11 @@ export function ProductEditor({ initial }: { initial: ProductForm }) {
             </p>
           ))}
         <div className="mt-5">
+          <AdminField label="Product video URL" error={err("videoUrl")} hint="Use a /public path or HTTPS URL to an MP4, WebM or Ogg video.">
+            <input className={inputCls} value={form.videoUrl} onChange={(e) => set("videoUrl", e.target.value)} placeholder="/video/poydagar-video.mp4" />
+          </AdminField>
+        </div>
+        <div className="mt-5">
           <AdminField label="3D model URL (.glb / .gltf, optional)" error={err("modelUrl")} hint="Only a model of this exact watch. Leave empty to use photos (and the labelled illustrative preview if enabled in settings).">
             <input className={inputCls} value={form.modelUrl} onChange={(e) => set("modelUrl", e.target.value)} placeholder="https://…/meridian.glb" />
           </AdminField>

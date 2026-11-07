@@ -1,5 +1,5 @@
 /**
- * Seeds PREVIEW content: one demo product (flagged isDemo, placeholder images)
+ * Seeds PREVIEW content: one demo product (flagged isDemo)
  * and default settings. Never overwrites existing data unless --force is given.
  *
  *   npm run seed            # insert only what is missing

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { captureAttribution } from "@/lib/attribution";
+import { checkoutAnalytics, trackEcommerceEvent, trackPurchase } from "@/lib/analytics";
 import { formatMoney } from "@/lib/format";
 import { calculateTotals } from "@/lib/pricing";
 import type { OrderConfirmation } from "@/lib/types";
@@ -40,6 +41,7 @@ export function OrderForm() {
   const [confirmation, setConfirmation] = useState<OrderConfirmation | null>(null);
   const idempotencyKey = useRef<string>("");
   const readyAt = useRef<number>(0);
+  const checkoutStarted = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
 
@@ -137,6 +139,7 @@ export function OrderForm() {
 
       if (res.ok && data?.order) {
         const order = data.order as OrderConfirmation;
+        if (connected && !product.isDemo) trackPurchase(order);
         try {
           sessionStorage.setItem(
             LAST_ORDER_KEY,
@@ -182,7 +185,18 @@ export function OrderForm() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-      <form ref={formRef} onSubmit={onSubmit} noValidate className="lg:col-span-7" aria-describedby="order-form-note">
+      <form
+        ref={formRef}
+        onSubmit={onSubmit}
+        onFocusCapture={() => {
+          if (checkoutStarted.current || !connected || product.isDemo) return;
+          checkoutStarted.current = true;
+          trackEcommerceEvent("begin_checkout", checkoutAnalytics(product, settings, variant, quantity));
+        }}
+        noValidate
+        className="lg:col-span-7"
+        aria-describedby="order-form-note"
+      >
         {!connected ? (
           <div className="mb-8 flex gap-3 border-l-2 border-champagne bg-porcelain px-4 py-3 text-sm text-graphite">
             <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-champagne-ink" />

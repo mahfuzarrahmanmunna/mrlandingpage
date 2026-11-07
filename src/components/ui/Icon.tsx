@@ -19,7 +19,8 @@ type Name =
   | "facebook"
   | "instagram"
   | "tiktok"
-  | "youtube";
+  | "youtube"
+  | "play";
 
 const paths: Record<Name, React.ReactNode> = {
   truck: (
@@ -94,6 +95,7 @@ const paths: Record<Name, React.ReactNode> = {
       <path d="m4 18 5-5 4 4 2.5-2.5L20 19" />
     </>
   ),
+  play: <path d="M8 5.5v13l10.5-6.5L8 5.5Z" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   alert: (
     <>
