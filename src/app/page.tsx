@@ -12,6 +12,7 @@ import { VariantSelector } from "@/components/sections/VariantSelector";
 import { WhyChoose } from "@/components/sections/WhyChoose";
 import { EnquiryForm } from "@/components/storefront/EnquiryForm";
 import { GoogleTagManager } from "@/components/storefront/GoogleTagManager";
+import { MetaPixel } from "@/components/storefront/MetaPixel";
 import { StickyBar } from "@/components/storefront/StickyBar";
 import { StorefrontAnalytics } from "@/components/storefront/StorefrontAnalytics";
 import { StorefrontProvider } from "@/components/storefront/StorefrontProvider";
@@ -85,33 +86,6 @@ function StructuredData({ product, settings }: { product: PublicProduct; setting
 //   );
 // }
 
-function CollectionRail({ product, brandName }: { product: PublicProduct; brandName: string }) {
-  const reference = product.specs.model || product.sku || product.variants[0]?.sku;
-
-  return (
-    <div className="border-y border-rule-soft bg-porcelain/75">
-      <div className="mx-auto flex w-full max-w-[1360px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-3.5 sm:px-8 lg:px-12">
-        <p className="label flex items-center gap-2 text-mist">
-          <span aria-hidden className="size-1.5 rounded-full bg-champagne" />
-          {brandName}
-          <span aria-hidden className="text-rule">/</span>
-          Timepieces
-        </p>
-        <div className="flex items-center gap-5">
-          {reference ? (
-            <p className="label text-mist">
-              Reference <span className="ml-1.5 text-ink">{reference}</span>
-            </p>
-          ) : null}
-          <p className="label hidden text-mist sm:block">
-            {String(product.variants.length).padStart(2, "0")} {product.variants.length === 1 ? "edition" : "editions"}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default async function Home() {
   const [{ product, settings, connected }, year] = await Promise.all([getStorefront(), copyrightYear()]);
 
@@ -119,12 +93,13 @@ export default async function Home() {
     return (
       <>
         <GoogleTagManager />
+        <MetaPixel />
         <Header brandName={settings.brandName} logoUrl={settings.logoUrl} announcement={settings.announcement} />
         <main id="main" className="mx-auto grid min-h-[70vh] max-w-3xl place-items-center px-6 text-center">
           <div>
             <p className="label text-champagne-ink">{settings.brandName}</p>
-            <h1 className="display mt-6 text-6xl text-ink">A new piece is on its way.</h1>
-            <p className="mt-6 text-graphite">Our next watch is being prepared. Please check back soon.</p>
+            <h1 lang="bn" className="display mt-6 text-5xl text-ink">নতুন ঘড়ি শীঘ্রই আসছে</h1>
+            <p lang="bn" className="mt-6 text-graphite">আমাদের পরবর্তী ঘড়িটি প্রস্তুত হচ্ছে। একটু পরে আবার দেখুন।</p>
           </div>
         </main>
         <Footer settings={settings} year={year} />
@@ -135,18 +110,18 @@ export default async function Home() {
   return (
     <StorefrontProvider product={product} settings={settings} connected={connected}>
       <GoogleTagManager />
+      <MetaPixel />
       <StorefrontAnalytics />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-ink focus:px-4 focus:py-3 focus:text-porcelain"
       >
-        Skip to content
+        মূল অংশে যান
       </a>
       {/* {product.isDemo || !connected ? <PreviewNotice /> : null} */}
       <Header brandName={settings.brandName} logoUrl={settings.logoUrl} announcement={settings.announcement} />
-      <CollectionRail product={product} brandName={settings.brandName} />
-      <main id="main" className="bg-ivory">
-        <div className="relative isolate overflow-x-clip bg-[radial-gradient(ellipse_at_72%_30%,rgba(217,195,155,0.2),transparent_38%),linear-gradient(180deg,#fbf9f4_0%,#f6f2ea_68%,#eee7da_150%)]">
+      <main id="main" lang="bn" className="bg-ivory">
+        <div className="relative isolate overflow-x-clip bg-[linear-gradient(180deg,#f0fdf4_0%,#ffffff_55%)]">
           <div className="relative z-10">
             <Hero />
           </div>
@@ -156,7 +131,7 @@ export default async function Home() {
         <VariantSelector />
         <OrderSection />
         <WhyChoose brandName={settings.brandName} items={settings.whyChoose} testimonials={settings.testimonials} />
-        <FinalCta title={product.title} image={product.images[0]} />
+        <FinalCta title={product.title} image={product.images[0]} cod={settings.codEnabled} />
       </main>
       <Footer settings={settings} year={year} enquiry={<EnquiryForm />} />
       <StickyBar />

@@ -42,7 +42,7 @@ export function StorefrontAnalytics() {
   }, []);
 
   useEffect(() => {
-    if (!connected || product.isDemo || viewedItems.current.has(variant.sku)) return;
+    if (!connected || viewedItems.current.has(variant.sku)) return;
     viewedItems.current.add(variant.sku);
     trackEcommerceEvent("view_item", {
       currency: settings.currency.code,

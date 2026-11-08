@@ -18,6 +18,16 @@ type Values = { name: string; phone: string; address: string; city: string; zone
 const FIELD_ORDER: (keyof Values)[] = ["name", "phone", "address", "city", "zoneId", "email", "note"];
 const LAST_ORDER_KEY = "mri:last-order";
 
+/**
+ * Pre-select "Outside Dhaka" (most customers are outside the capital); the buyer can still change it.
+ * Matched by id or label so it survives renaming in admin. Falls back to the only zone, else none.
+ */
+function defaultZoneId(zones: { id: string; label: string }[]) {
+  if (zones.length === 1) return zones[0]!.id;
+  const outside = zones.find((z) => /outside|বাইরে/i.test(`${z.id} ${z.label}`));
+  return outside?.id ?? "";
+}
+
 function newKey() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID().replace(/-/g, "");
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
@@ -31,7 +41,7 @@ export function OrderForm() {
     phone: "",
     address: "",
     city: "",
-    zoneId: zones.length === 1 ? zones[0]!.id : "",
+    zoneId: defaultZoneId(zones),
     email: "",
     note: "",
   });
@@ -42,6 +52,7 @@ export function OrderForm() {
   const idempotencyKey = useRef<string>("");
   const readyAt = useRef<number>(0);
   const checkoutStarted = useRef(false);
+  const warmedUp = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
 
@@ -117,7 +128,7 @@ export function OrderForm() {
       return;
     }
 
-    const honeypot = (formRef.current?.elements.namedItem("company") as HTMLInputElement | null)?.value ?? "";
+    const honeypot = (formRef.current?.elements.namedItem("mri_hp_check") as HTMLInputElement | null)?.value ?? "";
     setSubmitting(true);
     try {
       const res = await fetch("/api/orders", {
@@ -139,7 +150,9 @@ export function OrderForm() {
 
       if (res.ok && data?.order) {
         const order = data.order as OrderConfirmation;
-        if (connected && !product.isDemo) trackPurchase(order);
+        // A confirmed order from the live store is a real sale — always report it
+        // (GTM/GA4 "purchase" + Meta Pixel "Purchase"), deduped per order number.
+        trackPurchase(order);
         try {
           sessionStorage.setItem(
             LAST_ORDER_KEY,
@@ -156,10 +169,14 @@ export function OrderForm() {
         focusFirstError(data.fields);
       }
       if (data?.code === "OUT_OF_STOCK" && typeof data.available === "number") applyStock(variant.key, data.available);
-      setFormError(data?.error ?? "Something went wrong. Please try again.");
+      setFormError(
+        data?.fields
+          ? "লাল চিহ্নিত ঘরগুলো ঠিক করে আবার চেষ্টা করুন।"
+          : (data?.error ?? "কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।"),
+      );
       requestAnimationFrame(() => errorRef.current?.focus());
     } catch {
-      setFormError("Network error — please check your connection and try again. You won't be charged twice.");
+      setFormError("নেটওয়ার্ক সমস্যা — ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন। একই অর্ডার দুইবার হবে না।");
       requestAnimationFrame(() => errorRef.current?.focus());
     } finally {
       setSubmitting(false);
@@ -189,27 +206,37 @@ export function OrderForm() {
         ref={formRef}
         onSubmit={onSubmit}
         onFocusCapture={() => {
-          if (checkoutStarted.current || !connected || product.isDemo) return;
+          // Open the server's database connection while the customer is still typing,
+          // so "Place order" doesn't wait for a cold connection.
+          if (!warmedUp.current && connected) {
+            warmedUp.current = true;
+            fetch("/api/product", { cache: "no-store" }).catch(() => {});
+          }
+          if (checkoutStarted.current || !connected) return;
           checkoutStarted.current = true;
           trackEcommerceEvent("begin_checkout", checkoutAnalytics(product, settings, variant, quantity));
         }}
         noValidate
-        className="lg:col-span-7"
+        className="relative rounded-[var(--radius-md)] border border-rule bg-white p-5 shadow-soft sm:p-7 lg:col-span-7"
         aria-describedby="order-form-note"
       >
         {!connected ? (
-          <div className="mb-8 flex gap-3 border-l-2 border-champagne bg-porcelain px-4 py-3 text-sm text-graphite">
-            <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-champagne-ink" />
+          <div className="mb-6 flex gap-3 rounded-[var(--radius-sm)] bg-offer-soft px-4 py-3 text-sm text-graphite">
+            <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-offer" />
             <p>
-              Preview mode — the store database is not connected yet, so orders can&rsquo;t be placed from this page.
+              প্রিভিউ মোড — স্টোর ডাটাবেস এখনো যুক্ত হয়নি, তাই এই পেজ থেকে অর্ডার করা যাবে না।
             </p>
           </div>
         ) : null}
 
         <fieldset className="grid gap-5" disabled={submitting}>
-          <legend className="label mb-5 text-mist">01 — Your details</legend>
+          <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
+            <span className="num grid size-8 place-items-center rounded-full bg-champagne text-sm text-white">1</span>
+            আপনার তথ্য
+          </legend>
           <TextField
-            label="Full name"
+            label="আপনার নাম"
+            placeholder="যেমন: মোঃ রহিম"
             name="name"
             autoComplete="name"
             value={values.name}
@@ -219,7 +246,7 @@ export function OrderForm() {
             maxLength={80}
           />
           <TextField
-            label="Mobile number"
+            label="মোবাইল নম্বর"
             name="phone"
             type="tel"
             inputMode="tel"
@@ -229,11 +256,11 @@ export function OrderForm() {
             onChange={set("phone")}
             onBlur={() => values.phone && validateField("phone")}
             error={errors.phone}
-            hint="We'll call this number to confirm your order."
+            hint="অর্ডার কনফার্ম করতে এই নম্বরে কল করা হবে।"
             maxLength={20}
           />
           <TextField
-            label="Email"
+            label="ইমেইল"
             name="email"
             type="email"
             autoComplete="email"
@@ -246,13 +273,16 @@ export function OrderForm() {
           />
         </fieldset>
 
-        <fieldset className="mt-10 grid gap-5" disabled={submitting}>
-          <legend className="label mb-5 text-mist">02 — Delivery</legend>
+        <fieldset className="mt-8 grid gap-5" disabled={submitting}>
+          <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
+            <span className="num grid size-8 place-items-center rounded-full bg-champagne text-sm text-white">2</span>
+            ডেলিভারি ঠিকানা
+          </legend>
           <TextArea
-            label="Full delivery address"
+            label="সম্পূর্ণ ঠিকানা"
             name="address"
             autoComplete="street-address"
-            placeholder="House, road, area"
+            placeholder="বাসা নং, রোড, এলাকা, থানা"
             rows={3}
             value={values.address}
             onChange={set("address")}
@@ -261,7 +291,8 @@ export function OrderForm() {
             maxLength={300}
           />
           <TextField
-            label="District / city"
+            label="জেলা / শহর"
+            placeholder="যেমন: ঢাকা"
             name="city"
             autoComplete="address-level2"
             value={values.city}
@@ -272,12 +303,12 @@ export function OrderForm() {
           />
 
           <div role="radiogroup" aria-labelledby="zone-label" aria-describedby={errors.zoneId ? "zoneId-error" : undefined}>
-            <p id="zone-label" className="mb-2 text-[0.8rem] font-semibold text-graphite">
-              Delivery area
+            <p id="zone-label" className="mb-2 text-[0.95rem] font-semibold text-graphite">
+              ডেলিভারি এলাকা
             </p>
             {noZones ? (
               <p className="rounded-[var(--radius-sm)] border border-rule bg-porcelain px-4 py-3 text-sm text-graphite">
-                Delivery areas haven&rsquo;t been published yet. Please contact us to order.
+                ডেলিভারি এলাকা এখনো যোগ করা হয়নি। অর্ডার করতে আমাদের কল করুন।
               </p>
             ) : (
               <div className="grid gap-2.5 sm:grid-cols-2">
@@ -287,22 +318,22 @@ export function OrderForm() {
                     <label
                       key={z.id}
                       className={`flex min-h-16 cursor-pointer items-center justify-between gap-3 rounded-[var(--radius-sm)] border px-4 py-3 transition ${
-                        checked ? "border-ink bg-porcelain shadow-soft" : "border-rule bg-porcelain/60 hover:border-steel"
+                        checked ? "border-champagne bg-champagne-soft ring-1 ring-champagne" : "border-rule bg-white hover:border-champagne/60"
                       } ${errors.zoneId ? "border-danger" : ""} has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink`}
                     >
                       <span className="flex items-center gap-3">
                         <span
                           aria-hidden
-                          className={`grid size-4 place-items-center rounded-full border ${checked ? "border-ink" : "border-steel"}`}
+                          className={`grid size-5 place-items-center rounded-full border-2 ${checked ? "border-champagne" : "border-steel"}`}
                         >
-                          {checked ? <span className="size-2 rounded-full bg-ink" /> : null}
+                          {checked ? <span className="size-2.5 rounded-full bg-champagne" /> : null}
                         </span>
                         <span>
-                          <span className="block text-sm font-semibold text-ink">{z.label}</span>
+                          <span className="block text-[0.95rem] font-bold text-ink">{z.label}</span>
                           {z.description ? <span className="block text-xs text-mist">{z.description}</span> : null}
                         </span>
                       </span>
-                      <span className="num text-sm text-graphite">{z.fee === 0 ? "Free" : money(z.fee)}</span>
+                      <span className="num text-base font-bold text-champagne-ink">{z.fee === 0 ? "ফ্রি" : money(z.fee)}</span>
                       <input
                         type="radio"
                         name="zoneId"
@@ -327,11 +358,11 @@ export function OrderForm() {
           </div>
 
           <TextArea
-            label="Order note"
+            label="অতিরিক্ত নোট"
             name="note"
             optional
             rows={2}
-            placeholder="Delivery instructions, preferred call time…"
+            placeholder="ডেলিভারির নির্দেশনা, কখন কল করবেন…"
             value={values.note}
             onChange={set("note")}
             error={errors.note}
@@ -339,33 +370,62 @@ export function OrderForm() {
           />
         </fieldset>
 
-        <fieldset className="mt-10" disabled={submitting}>
-          <legend className="label mb-5 text-mist">03 — Payment</legend>
+        <fieldset className="mt-8" disabled={submitting}>
+          <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
+            <span className="num grid size-8 place-items-center rounded-full bg-champagne text-sm text-white">3</span>
+            পেমেন্ট
+          </legend>
           {paymentAvailable ? (
-            <div className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border border-ink bg-porcelain px-4 py-4 shadow-soft">
+            <div className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border-2 border-champagne bg-champagne-soft px-4 py-4">
               <span className="flex items-center gap-3">
-                <Icon name="cash" className="text-graphite" />
+                <Icon name="cash" className="text-champagne-ink" />
                 <span>
-                  <span className="block text-sm font-semibold text-ink">Cash on delivery</span>
-                  <span className="block text-xs text-mist">Pay when your order arrives.</span>
+                  <span className="block text-[0.95rem] font-bold text-ink">ক্যাশ অন ডেলিভারি</span>
+                  <span className="block text-sm text-graphite">পণ্য হাতে পেয়ে টাকা পরিশোধ করুন।</span>
                 </span>
               </span>
-              <Icon name="check" size={18} className="text-ink" />
+              <Icon name="check" size={20} strokeWidth={2.5} className="text-champagne-ink" />
             </div>
           ) : (
             <p className="rounded-[var(--radius-sm)] border border-rule bg-porcelain px-4 py-3 text-sm text-graphite">
-              No payment method is currently available online. Please contact us to order.
+              এই মুহূর্তে অনলাইনে অর্ডার নেওয়া যাচ্ছে না। অর্ডার করতে আমাদের কল করুন।
             </p>
           )}
         </fieldset>
 
-        {/* Honeypot — hidden from people and assistive tech */}
+        {/* Honeypot — hidden from people and assistive tech. Deliberately NOT named like a real
+            field (e.g. "company"), otherwise browser autofill fills it and real orders get rejected. */}
         <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
-          <label>
-            Company
-            <input type="text" name="company" tabIndex={-1} autoComplete="off" defaultValue="" />
-          </label>
+          <input
+            type="text"
+            name="mri_hp_check"
+            tabIndex={-1}
+            autoComplete="off"
+            data-1p-ignore
+            data-lpignore="true"
+            data-form-type="other"
+            defaultValue=""
+          />
         </div>
+
+        {submitting ? (
+          <div
+            role="status"
+            aria-live="assertive"
+            className="absolute inset-0 z-10 grid place-items-center rounded-[var(--radius-md)] bg-white/85 backdrop-blur-[2px]"
+          >
+            <div className="flex flex-col items-center gap-4 px-6 text-center">
+              <span className="relative grid size-16 place-items-center">
+                <span className="absolute inset-0 animate-[spin-slow_0.9s_linear_infinite] rounded-full border-4 border-champagne-soft border-t-champagne" />
+                <Icon name="cash" size={24} className="text-champagne-ink" />
+              </span>
+              <div>
+                <p className="text-lg font-bold text-ink">আপনার অর্ডার প্রসেস হচ্ছে…</p>
+                <p className="mt-1 text-sm text-graphite">অনুগ্রহ করে পেজটি বন্ধ করবেন না বা আবার চাপবেন না।</p>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {formError ? (
           <div
@@ -383,24 +443,24 @@ export function OrderForm() {
           <Button
             type="submit"
             size="lg"
-            className="w-full"
+            className="w-full whitespace-normal text-xl"
             loading={submitting}
-            loadingLabel="Placing your order…"
+            loadingLabel="অর্ডার হচ্ছে…"
             disabled={soldOut || noZones || !paymentAvailable}
           >
-            {soldOut ? "Selected option unavailable" : `Place order · ${money(preview.total)}`}
+            {soldOut ? "এই রঙটি স্টকে নেই" : `অর্ডার কনফার্ম করুন · ${money(preview.total)}`}
           </Button>
           <p id="order-form-note" className="mt-3 text-center text-xs leading-relaxed text-mist">
-            Your total is confirmed by our system when you place the order.
-            {settings.policies.privacy ? " Details are used only to process and deliver your order." : null}
+            অর্ডার করার সময় সিস্টেম আপনার মোট দাম নিশ্চিত করবে।
+            {settings.policies.privacy ? " আপনার তথ্য শুধু অর্ডার ও ডেলিভারির জন্য ব্যবহার করা হবে।" : null}
           </p>
         </div>
       </form>
 
-      <aside className="lg:col-span-5" aria-label="Order summary">
+      <aside className="order-first lg:order-none lg:col-span-5" aria-label="অর্ডার সারাংশ">
         <div className="lg:sticky lg:top-[calc(var(--header-h)+24px)]">
-          <div className="rounded-[var(--radius-md)] border border-rule bg-porcelain p-5 shadow-soft sm:p-7">
-            <p className="label text-mist">Order summary</p>
+          <div className="rounded-[var(--radius-md)] border border-rule bg-white p-5 shadow-soft sm:p-7">
+            <p className="text-lg font-bold text-ink">আপনার অর্ডার</p>
             <div className="mt-5 flex gap-4">
               <div className="paper relative h-24 w-20 shrink-0 overflow-hidden rounded-[var(--radius-sm)] ring-1 ring-rule-soft">
                 {(variant.images[0] ?? product.images[0]) ? (
@@ -414,37 +474,37 @@ export function OrderForm() {
                 ) : null}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-serif text-2xl leading-tight text-ink">{product.title}</p>
-                <p className="mt-1 text-sm text-graphite">{variant.name}</p>
+                <p className="text-xl font-bold leading-tight text-ink">{product.title}</p>
+                <p className="mt-1 text-sm text-graphite">রঙ: {variant.name}</p>
                 <p className="num mt-0.5 text-xs text-mist">SKU {variant.sku}</p>
               </div>
             </div>
 
             <div className="mt-5 flex items-center justify-between border-t border-rule-soft pt-5">
-              <span className="text-sm text-graphite">Quantity</span>
+              <span className="text-[0.95rem] font-semibold text-graphite">পরিমাণ</span>
               <QuantityStepper id="order-qty" />
             </div>
 
             <dl className="num mt-5 space-y-3 border-t border-rule-soft pt-5 text-sm">
               <div className="flex justify-between">
                 <dt className="text-graphite">
-                  Subtotal <span className="text-mist">({quantity} × {money(unitPrice)})</span>
+                  পণ্যের দাম <span className="text-mist">({quantity} × {money(unitPrice)})</span>
                 </dt>
                 <dd className="text-ink">{money(preview.subtotal)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-graphite">Delivery{zone ? <span className="text-mist"> · {zone.label}</span> : null}</dt>
-                <dd className="text-ink">{zone ? (zone.fee === 0 ? "Free" : money(zone.fee)) : "Select area"}</dd>
+                <dt className="text-graphite">ডেলিভারি চার্জ{zone ? <span className="text-mist"> · {zone.label}</span> : null}</dt>
+                <dd className="text-ink">{zone ? (zone.fee === 0 ? "ফ্রি" : money(zone.fee)) : "এলাকা বাছাই করুন"}</dd>
               </div>
               {preview.discount > 0 ? (
                 <div className="flex justify-between">
-                  <dt className="text-graphite">Discount</dt>
+                  <dt className="text-graphite">ছাড়</dt>
                   <dd className="text-success">−{money(preview.discount)}</dd>
                 </div>
               ) : null}
               <div className="flex items-baseline justify-between border-t border-rule pt-4">
-                <dt className="label text-ink">Total payable</dt>
-                <dd className="font-serif text-3xl text-ink" aria-live="polite">
+                <dt className="text-base font-bold text-ink">সর্বমোট</dt>
+                <dd className="text-3xl font-extrabold text-champagne-ink" aria-live="polite">
                   {money(preview.total)}
                 </dd>
               </div>

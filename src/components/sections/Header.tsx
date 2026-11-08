@@ -6,11 +6,11 @@ import { buttonClass } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 
 const NAV = [
-  { href: "#top", label: "The watch" },
-  { href: "#details", label: "Details" },
-  { href: "#editions", label: "Editions" },
-  { href: "#why", label: "Why us" },
-  { href: "#contact", label: "Contact" },
+  { href: "#top", label: "ঘড়ি" },
+  { href: "#details", label: "বৈশিষ্ট্য" },
+  { href: "#editions", label: "রঙ বাছাই" },
+  { href: "#order", label: "অর্ডার" },
+  { href: "#contact", label: "যোগাযোগ" },
 ];
 
 export function Wordmark({ brandName, logoUrl }: { brandName: string; logoUrl?: string }) {
@@ -21,7 +21,7 @@ export function Wordmark({ brandName, logoUrl }: { brandName: string; logoUrl?: 
   }
   const [first, ...rest] = brandName.split(" ");
   return (
-    <span className="flex items-baseline gap-1.5 font-serif text-[1.05rem] leading-none tracking-[0.14em] text-ink uppercase sm:gap-2 sm:text-[1.35rem] sm:tracking-[0.18em]">
+    <span className="flex items-baseline gap-1.5 text-[1.1rem] font-extrabold leading-none tracking-[0.04em] text-ink uppercase sm:text-[1.3rem]">
       <span>{first}</span>
       {rest.length ? <span className="text-champagne-ink">{rest.join(" ")}</span> : null}
     </span>
@@ -49,13 +49,14 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
   return (
     <>
       {announcement ? (
-        <div className="border-b border-rule-soft bg-linen/70 px-4 py-2 text-center text-[0.72rem] tracking-[0.12em] text-graphite">
+        <div className="bg-champagne px-4 py-2 text-center text-[0.85rem] font-semibold text-white">
           {announcement}
         </div>
       ) : null}
       <header
+        lang="bn"
         className={`sticky top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
-          scrolled || open ? "border-b border-rule-soft bg-ivory/88 backdrop-blur-md" : "border-b border-transparent bg-transparent"
+          scrolled || open ? "border-b border-rule bg-white/95 shadow-soft backdrop-blur-md" : "border-b border-transparent bg-transparent"
         }`}
       >
         <div className="mx-auto flex h-[var(--header-h)] w-full max-w-[1360px] items-center justify-between gap-3 px-4 sm:gap-6  sm:px-8 lg:px-12">
@@ -69,7 +70,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
                 <li key={n.href}>
                   <a
                     href={n.href}
-                    className="label relative inline-flex min-h-11 items-center text-graphite transition-colors after:absolute after:inset-x-0 after:bottom-2.5 after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-500 hover:text-ink hover:after:scale-x-100"
+                    className="inline-flex min-h-11 items-center text-[0.95rem] font-semibold text-graphite transition-colors hover:text-champagne-ink"
                   >
                     {n.label}
                   </a>
@@ -79,15 +80,15 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
           </nav>
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <a href="#order" className={buttonClass("primary", "sm", "px-3.5 sm:px-5")}>
-              Order now
+            <a href="#order" className={buttonClass("primary", "sm", "px-4 sm:px-5")}>
+              অর্ডার করুন
             </a>
             <button
               type="button"
               className="grid size-11 place-items-center text-ink lg:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
-              aria-label={open ? "Close menu" : "Open menu"}
+              aria-label={open ? "মেনু বন্ধ করুন" : "মেনু খুলুন"}
               onClick={() => setOpen((o) => !o)}
             >
               {open ? (
@@ -104,7 +105,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
         <nav
           id="mobile-nav"
           aria-label="Page sections"
-          className={`overflow-hidden border-t border-rule-soft bg-ivory transition-[max-height,opacity] duration-500 lg:hidden ${
+          className={`overflow-hidden border-t border-rule-soft bg-white transition-[max-height,opacity] duration-500 lg:hidden ${
             open ? "max-h-96 opacity-100" : "pointer-events-none max-h-0 opacity-0"
           }`}
           inert={!open}
@@ -115,7 +116,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
                 <a
                   href={n.href}
                   onClick={() => setOpen(false)}
-                  className="flex min-h-12 items-center justify-between border-b border-rule-soft font-serif text-2xl text-ink last:border-0"
+                  className="flex min-h-12 items-center justify-between border-b border-rule-soft text-lg font-semibold text-ink last:border-0"
                 >
                   {n.label}
                   <Icon name="arrow-right" size={18} className="text-mist" />

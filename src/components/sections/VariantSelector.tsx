@@ -12,47 +12,45 @@ export function VariantSelector() {
   const money = (n: number) => formatMoney(n, settings.currency);
 
   return (
-    <section id="editions" aria-labelledby="editions-title" className="border-t border-rule bg-linen/45">
-      <div className="mx-auto w-full max-w-[1360px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+    <section id="editions" aria-labelledby="editions-title" className="bg-linen">
+      <div className="mx-auto w-full max-w-[1200px] px-4 py-14 sm:px-8 lg:px-10 lg:py-20">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
-            <p className="label text-champagne-ink" data-reveal>
-              Choose your {product.variantLabel.toLowerCase()}
+            <p className="eyebrow" data-reveal>
+              রঙ বাছাই
             </p>
-            <h2 id="editions-title" className="display mt-5 text-[clamp(2.5rem,6vw,4.5rem)] text-ink" data-reveal>
+            <h2 id="editions-title" className="display num mt-4 text-[clamp(1.75rem,4.5vw,2.75rem)] text-ink" data-reveal>
               {product.variants.length > 1 ? (
                 <>
-                  {product.variants.length} ways <span className="italic text-graphite">to wear it.</span>
+                  আপনার পছন্দের <span className="text-champagne-ink">রঙটি বেছে নিন</span>
                 </>
               ) : (
-                <>
-                  One edition, <span className="italic text-graphite">perfected.</span>
-                </>
+                <>আপনার ঘড়ি</>
               )}
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-            <span className="label text-mist">Quantity</span>
+            <span className="text-[0.95rem] font-semibold text-graphite">পরিমাণ</span>
             <QuantityStepper id="editions-qty" />
-            <span className="num font-serif text-2xl text-ink" aria-live="polite">
+            <span className="num text-2xl font-extrabold text-champagne-ink" aria-live="polite">
               {money(subtotal)}
-              <span className="sr-only"> for {quantity}</span>
+              <span className="sr-only"> ({quantity}টি)</span>
             </span>
           </div>
         </div>
 
-        <fieldset className="mt-12">
-          <legend className="sr-only">{product.variantLabel}</legend>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <fieldset className="mt-6">
+          <legend className="sr-only">রঙ বাছাই করুন</legend>
+          <div className="grid grid-cols-1 gap-2.5 min-[480px]:grid-cols-2 lg:grid-cols-3">
             {product.variants.map((v) => {
               const selected = v.key === variant.key;
               const img = v.images[0] ?? product.images[0];
               return (
                 <label
                   key={v.key}
-                  className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-[var(--radius-md)] border bg-porcelain transition duration-300 ${
-                    selected ? "border-ink shadow-lift" : "border-rule hover:-translate-y-0.5 hover:border-steel hover:shadow-soft"
-                  } ${v.available ? "" : "cursor-not-allowed"} has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-ink`}
+                  className={`relative flex cursor-pointer items-center gap-3 rounded-[var(--radius-sm)] border-2 bg-white p-2 pr-3 transition ${
+                    selected ? "border-champagne bg-champagne-soft/40 shadow-soft" : "border-rule hover:border-champagne/50"
+                  } ${v.available ? "" : "cursor-not-allowed opacity-60"} has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink`}
                 >
                   <input
                     type="radio"
@@ -63,59 +61,49 @@ export function VariantSelector() {
                     onChange={() => setVariantKey(v.key)}
                     className="sr-only"
                   />
-                  <div className="paper relative aspect-[5/4] overflow-hidden">
+                  <div className="paper relative size-16 shrink-0 overflow-hidden rounded-[8px]">
                     {img ? (
                       <Image
                         src={img.url}
-                        alt={img.alt}
+                        alt=""
                         fill
-                        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
+                        sizes="64px"
                         loading="lazy"
                         unoptimized={img.url.endsWith(".svg")}
-                        className={`object-cover transition duration-700 group-hover:scale-[1.03] ${v.available ? "" : "grayscale-[60%] opacity-60"}`}
+                        className={`object-cover ${v.available ? "" : "grayscale"}`}
                       />
                     ) : null}
-                    <span
-                      className={`absolute right-3 top-3 grid size-8 place-items-center rounded-full border transition ${
-                        selected ? "border-ink bg-ink text-porcelain" : "border-rule bg-porcelain/90 text-transparent"
-                      }`}
-                      aria-hidden
-                    >
-                      <Icon name="check" size={16} strokeWidth={1.8} />
-                    </span>
-                    {!v.available ? (
-                      <span className="label absolute left-3 top-3 rounded-[var(--radius-sm)] bg-ink px-2.5 py-1.5 text-[0.6rem] text-porcelain">
-                        Unavailable
-                      </span>
-                    ) : null}
                   </div>
-                  <div className="flex flex-1 items-end justify-between gap-4 p-5">
-                    <div>
-                      <p className="flex items-center gap-2.5 font-serif text-2xl text-ink">
-                        {v.swatch ? (
-                          <span aria-hidden className="size-3 rounded-full ring-1 ring-rule" style={{ background: v.swatch }} />
-                        ) : null}
-                        {v.name}
-                      </p>
-                      <p className="num mt-1 text-xs text-mist">SKU {v.sku}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="num font-serif text-xl text-ink">{money(v.price)}</p>
-                      {v.compareAtPrice ? (
-                        <p className="num text-xs text-mist line-through">{money(v.compareAtPrice)}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-2 truncate text-base font-bold text-ink">
+                      {v.swatch ? (
+                        <span aria-hidden className="size-3 shrink-0 rounded-full ring-1 ring-rule" style={{ background: v.swatch }} />
                       ) : null}
-                      <p className="mt-0.5 text-xs text-graphite">
-                        {v.available ? (v.stock <= 3 ? `${v.stock} available` : "In stock") : "Out of stock"}
-                      </p>
-                    </div>
+                      {v.name}
+                    </p>
+                    <p className="num mt-0.5 flex items-baseline gap-2">
+                      <span className="text-base font-extrabold text-champagne-ink">{money(v.price)}</span>
+                      {v.compareAtPrice ? <span className="text-xs text-mist line-through">{money(v.compareAtPrice)}</span> : null}
+                    </p>
+                    <p className={`num text-xs ${v.available ? "text-success" : "text-danger"}`}>
+                      {v.available ? (v.stock <= 3 ? `মাত্র ${v.stock}টি বাকি` : "স্টকে আছে") : "স্টক শেষ"}
+                    </p>
                   </div>
+                  <span
+                    aria-hidden
+                    className={`grid size-6 shrink-0 place-items-center rounded-full border-2 transition ${
+                      selected ? "border-champagne bg-champagne text-white" : "border-rule text-transparent"
+                    }`}
+                  >
+                    <Icon name="check" size={13} strokeWidth={2.5} />
+                  </span>
                 </label>
               );
             })}
           </div>
         </fieldset>
         {maxQuantity > 0 && maxQuantity < settings.maxQuantityPerOrder ? (
-          <p className="mt-5 text-sm text-mist">Up to {maxQuantity} can be ordered for this {product.variantLabel.toLowerCase()}.</p>
+          <p className="num mt-5 text-sm text-mist">এই রঙের সর্বোচ্চ {maxQuantity}টি অর্ডার করা যাবে।</p>
         ) : null}
       </div>
     </section>

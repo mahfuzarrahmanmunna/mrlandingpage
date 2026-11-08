@@ -5,20 +5,20 @@ type Variant = "primary" | "secondary" | "ghost" | "quiet";
 type Size = "md" | "lg" | "sm";
 
 const base =
-  "group relative inline-flex select-none items-center justify-center gap-2.5 whitespace-nowrap font-sans font-semibold uppercase tracking-[0.16em] transition-[background-color,color,border-color,box-shadow,transform] duration-300 ease-out disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-px focus-visible:outline-offset-4";
+  "group relative inline-flex select-none items-center justify-center gap-2.5 whitespace-nowrap font-sans font-bold transition-[background-color,color,border-color,box-shadow,transform] duration-300 ease-out disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-px focus-visible:outline-offset-4";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-ink text-porcelain hover:bg-graphite shadow-[0_14px_30px_-18px_rgba(23,20,15,0.65)] hover:shadow-[0_18px_36px_-18px_rgba(23,20,15,0.7)]",
-  secondary: "border border-ink/80 text-ink hover:bg-ink hover:text-porcelain",
-  ghost: "border border-rule bg-porcelain/70 text-ink hover:border-ink/60 hover:bg-porcelain",
+    "bg-champagne text-white hover:bg-champagne-ink shadow-[0_10px_24px_-12px_rgba(22,163,74,0.7)] hover:shadow-[0_14px_30px_-12px_rgba(22,163,74,0.75)]",
+  secondary: "border-2 border-champagne text-champagne-ink bg-white hover:bg-champagne-soft",
+  ghost: "border border-rule bg-white text-ink hover:border-champagne hover:text-champagne-ink",
   quiet: "text-ink underline-offset-[6px] hover:underline",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "min-h-11 px-4 text-[0.66rem]",
-  md: "min-h-12 px-6 text-[0.7rem]",
-  lg: "min-h-14 px-8 text-[0.72rem]",
+  sm: "min-h-11 px-4 text-sm",
+  md: "min-h-12 px-6 text-[0.95rem]",
+  lg: "min-h-14 px-8 text-lg",
 };
 
 export function buttonClass(variant: Variant = "primary", size: Size = "md", extra = "") {

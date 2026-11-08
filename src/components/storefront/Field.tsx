@@ -9,8 +9,8 @@ type Common = {
 };
 
 const inputCls = (error?: string) =>
-  `peer block w-full rounded-[var(--radius-sm)] border bg-porcelain px-4 text-[0.95rem] text-ink placeholder:text-steel transition-[border-color,box-shadow] duration-200 outline-none focus:border-ink focus:shadow-[0_0_0_3px_rgba(23,20,15,0.08)] ${
-    error ? "border-danger focus:border-danger focus:shadow-[0_0_0_3px_rgba(156,58,43,0.12)]" : "border-rule hover:border-steel"
+  `peer block w-full rounded-[var(--radius-sm)] border bg-white px-4 text-base text-ink placeholder:text-steel transition-[border-color,box-shadow] duration-200 outline-none focus:border-champagne focus:shadow-[0_0_0_3px_rgba(22,163,74,0.15)] ${
+    error ? "border-danger focus:border-danger focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]" : "border-rule hover:border-steel"
   }`;
 
 function Meta({ name, error, hint }: { name: string; error?: string; hint?: ReactNode }) {
@@ -34,9 +34,9 @@ function Meta({ name, error, hint }: { name: string; error?: string; hint?: Reac
 
 function Label({ htmlFor, label, optional }: { htmlFor: string; label: string; optional?: boolean }) {
   return (
-    <label htmlFor={htmlFor} className="mb-2 flex items-baseline justify-between text-[0.8rem] font-semibold text-graphite">
+    <label htmlFor={htmlFor} className="mb-2 flex items-baseline justify-between text-[0.95rem] font-semibold text-graphite">
       <span>{label}</span>
-      {optional ? <span className="text-[0.72rem] font-normal text-mist">Optional</span> : null}
+      {optional ? <span className="text-sm font-normal text-mist">ঐচ্ছিক</span> : null}
     </label>
   );
 }
@@ -52,7 +52,7 @@ export function TextField({ label, name, error, hint, optional, ...rest }: Commo
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${name}-error` : hint ? `${name}-hint` : undefined}
         aria-required={optional ? undefined : true}
-        className={`${inputCls(error)} h-12`}
+        className={`${inputCls(error)} h-13`}
         {...rest}
       />
       <Meta name={name} error={error} hint={hint} />

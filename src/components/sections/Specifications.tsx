@@ -17,39 +17,39 @@ function features(s: ProductSpecs): Feature[] {
       ? {
           icon: "clock",
           title: `${clean(s.movement)} movement`,
-          text: s.powerSource ? `${clean(s.powerSource)} powered for accurate, low-maintenance timekeeping.` : "Accurate, low-maintenance timekeeping.",
+          text: "নির্ভুল সময়, ঝামেলাহীন ব্যবহার।",
         }
       : null,
     s.dialSize
       ? {
           icon: "seal",
           title: `${clean(s.dialSize)} ${clean(s.caseShape)?.toLowerCase() ?? ""} case`.replace(/\s+/g, " "),
-          text: s.caseThickness ? `Slim ${clean(s.caseThickness)} profile that sits comfortably under a shirt cuff.` : "A balanced size for most wrists.",
+          text: s.caseThickness ? `মাত্র ${clean(s.caseThickness)} পাতলা — শার্টের হাতার নিচে আরামে থাকে।` : "বেশিরভাগ হাতে মানানসই সাইজ।",
         }
       : null,
     s.strapMaterial
       ? {
           icon: "spark",
           title: `${clean(s.strapMaterial)} bracelet`,
-          text: `Adjustable links${s.clasp ? ` with a ${clean(s.clasp)?.toLowerCase()}` : ""}.`,
+          text: "হাতের মাপ অনুযায়ী অ্যাডজাস্ট করা যায়।",
         }
       : null,
     s.calendar
-      ? { icon: "clock", title: `${clean(s.calendar)} display`, text: "See the day and date at a glance." }
+      ? { icon: "clock", title: `${clean(s.calendar)} display`, text: "এক নজরে বার ও তারিখ দেখুন।" }
       : null,
-    s.luminous ? { icon: "spark", title: "Luminous hands", text: "Easy to read in low light and at night." } : null,
+    s.luminous ? { icon: "spark", title: "Luminous hands", text: "অন্ধকারে ও রাতেও সহজে সময় দেখা যায়।" } : null,
     s.glass
       ? {
           icon: "shield",
           title: /glass|crystal/i.test(clean(s.glass) ?? "") ? clean(s.glass)! : `${clean(s.glass)} glass`,
-          text: "Toughened for better scratch resistance than ordinary glass.",
+          text: "সাধারণ কাচের চেয়ে বেশি দাগ-প্রতিরোধী।",
         }
       : null,
     s.waterResistance
       ? {
           icon: "shield",
           title: `${clean(s.waterResistance)} splash resistant`,
-          text: "Fine for sweat, light rain and splashes. Not for bathing or swimming.",
+          text: "ঘাম, হালকা বৃষ্টি ও পানির ছিটায় সমস্যা নেই। গোসল বা সাঁতারে ব্যবহার করবেন না।",
         }
       : null,
   ];
@@ -76,14 +76,14 @@ export function Specifications({ product }: { product: PublicProduct }) {
   const detailImage = product.images[2] ?? product.images[1] ?? product.images[0];
 
   return (
-    <section id="details" aria-labelledby="details-title" className="mx-auto w-full max-w-[1280px] px-4 py-16 sm:px-6 md:px-8 lg:px-10 lg:py-28">
+    <section id="details" aria-labelledby="details-title" className="mx-auto w-full max-w-[1200px] px-4 py-14 sm:px-6 md:px-8 lg:px-10 lg:py-20">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
-          <p className="label text-champagne-ink" data-reveal>
-            Features
+          <p className="eyebrow" data-reveal>
+            বৈশিষ্ট্য
           </p>
-          <h2 id="details-title" className="display mt-4 text-[clamp(2.25rem,5vw,4rem)] text-ink" data-reveal>
-            Made for <span className="italic text-graphite">every day.</span>
+          <h2 id="details-title" className="display mt-4 text-[clamp(1.75rem,4.5vw,2.75rem)] text-ink" data-reveal>
+            কেন এই ঘড়িটি <span className="text-champagne-ink">সেরা?</span>
           </h2>
           {lead ? (
             <p lang={langOf(lead)} className="mt-6 max-w-md leading-relaxed text-graphite" data-reveal>
@@ -92,10 +92,10 @@ export function Specifications({ product }: { product: PublicProduct }) {
           ) : null}
           {uses.length ? (
             <div className="mt-6" data-reveal>
-              <p className="text-sm font-semibold text-ink">Perfect for</p>
+              <p className="text-[0.95rem] font-bold text-ink">যেখানে মানানসই</p>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {uses.map((u) => (
-                  <li key={u} lang={langOf(u)} className="rounded-full border border-rule bg-porcelain px-3.5 py-1.5 text-sm text-graphite">
+                  <li key={u} lang={langOf(u)} className="rounded-full bg-champagne-soft px-3.5 py-1.5 text-sm font-medium text-champagne-ink">
                     {u}
                   </li>
                 ))}
@@ -126,16 +126,16 @@ export function Specifications({ product }: { product: PublicProduct }) {
                 key={f.title}
                 data-reveal
                 data-reveal-delay={Math.min(i * 0.05, 0.3)}
-                className={`flex gap-4 rounded-[var(--radius-md)] bg-porcelain p-5 ring-1 ring-rule-soft sm:flex-col sm:gap-3 sm:p-6 ${
+                className={`flex gap-4 rounded-[var(--radius-md)] border border-rule bg-white p-5 shadow-soft sm:flex-col sm:gap-3 sm:p-6 ${
                   items.length % 2 === 1 && i === items.length - 1 ? "sm:col-span-2 sm:flex-row sm:items-center sm:gap-5" : ""
                 }`}
               >
-                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-champagne/15 text-champagne-ink">
+                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-champagne-soft text-champagne-ink">
                   <Icon name={f.icon} size={20} />
                 </span>
                 <div>
-                  <h3 className="font-serif text-xl leading-tight text-ink sm:text-2xl">{f.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-graphite">{f.text}</p>
+                  <h3 className="text-lg font-bold leading-tight text-ink">{f.title}</h3>
+                  <p lang="bn" className="mt-1.5 text-[0.95rem] leading-relaxed text-graphite">{f.text}</p>
                 </div>
               </li>
             ))}

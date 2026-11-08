@@ -18,18 +18,15 @@ import { langOf } from "@/lib/lang";
 export function Hero() {
   const { product, settings, variant, quantity, subtotal } = useStorefront();
   const title = settings.hero.headline || product.title;
-  const words = title.split(" ");
-  const last = words.length > 1 ? words.pop() : undefined;
   const soldOut = variant.stock < 1;
-  const trust = settings.trustHighlights.slice(0, 3);
+  // COD already has its own line in the delivery box below — don't repeat it.
+  const trust = settings.trustHighlights.filter((t) => !(settings.codEnabled && t.icon === "cash")).slice(0, 3);
+  const zones = settings.shippingZones;
+  const money = (n: number) => formatMoney(n, settings.currency);
 
   return (
     <section id="top" aria-labelledby="hero-title" className="relative isolate">
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -right-[15%] -top-[25%] h-[70vmax] w-[70vmax] rounded-full bg-[radial-gradient(closest-side,rgba(217,195,155,0.28),transparent)]" />
-      </div>
-
-      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 gap-6 px-4 pb-12 pt-4 sm:gap-8 sm:px-6 sm:pt-6 md:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12 lg:px-10 lg:pb-20 lg:pt-10 xl:gap-16">
+      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-6 px-4 pb-12 pt-4 sm:gap-8 sm:px-6 sm:pt-6 md:px-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-12 lg:px-10 lg:pb-20 lg:pt-10">
         {/* Gallery — first on mobile, stays in view on desktop while details scroll. */}
         <div className="min-w-0">
           <div className="mx-auto w-full max-w-[560px] lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:max-w-none">
@@ -40,78 +37,96 @@ export function Hero() {
         {/* Details & purchase */}
         <div className="mx-auto flex w-full min-w-0 max-w-[560px] flex-col lg:mx-0 lg:max-w-none lg:py-2">
           {settings.hero.eyebrow ? (
-            <p className="label flex items-center gap-3 text-champagne-ink">
-              <span aria-hidden className="h-px w-6 bg-champagne" />
+            <p lang={langOf(settings.hero.eyebrow)} className="eyebrow self-start">
+              <Icon name="spark" size={14} />
               {settings.hero.eyebrow}
             </p>
           ) : null}
 
-          <h1
-            id="hero-title"
-            className="display mt-3 text-balance text-[clamp(2.25rem,7vw,3.75rem)] leading-[1.02] text-ink"
-          >
-            {words.join(" ")}
-            {last ? <span className="italic text-graphite"> {last}</span> : null}
+          <h1 id="hero-title" lang={langOf(title)} className="display mt-3 text-balance text-[clamp(1.9rem,6vw,3rem)] text-ink">
+            {title}
           </h1>
 
           {product.tagline ? (
-            <p lang={langOf(product.tagline)} className="mt-3 max-w-xl text-pretty text-lg leading-snug text-graphite sm:text-xl">
+            <p lang={langOf(product.tagline)} className="mt-3 max-w-xl text-pretty text-lg leading-relaxed text-graphite">
               {product.tagline}
             </p>
           ) : null}
           {settings.hero.subheadline ? (
-            <p lang={langOf(settings.hero.subheadline)} className="mt-2 max-w-xl text-pretty text-[0.95rem] leading-relaxed text-mist">
+            <p lang={langOf(settings.hero.subheadline)} className="mt-2 max-w-xl text-pretty leading-relaxed text-mist">
               {settings.hero.subheadline}
             </p>
           ) : null}
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-y border-rule py-4">
-            <PriceDisplay />
-            <StockStatus />
+          {/* Price card */}
+          <div className="mt-5 rounded-[var(--radius-md)] border border-rule bg-white p-4 shadow-soft sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <PriceDisplay />
+              <StockStatus />
+            </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-5">
             <VariantSwatches />
           </div>
 
-          <div id="hero-cta" className="mt-6 grid gap-3">
-            <div className="flex flex-wrap items-stretch gap-3">
+          <div id="hero-cta" className="mt-5 grid gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[0.95rem] font-semibold text-graphite">পরিমাণ:</span>
               <QuantityStepper id="hero-qty" />
-              <Button
-                size="lg"
-                onClick={goToOrder}
-                disabled={soldOut}
-                className="min-w-[9rem] flex-1 px-5"
-                icon={
-                  soldOut ? undefined : (
-                    <Icon name="arrow-right" size={16} className="order-last transition-transform group-hover:translate-x-1" />
-                  )
-                }
-              >
-                {soldOut ? "Sold out" : "Order now"}
-              </Button>
+              {quantity > 1 && !soldOut ? (
+                <span className="num text-[0.95rem] text-graphite">
+                  মোট: <span className="font-bold text-ink">{money(subtotal)}</span>
+                </span>
+              ) : null}
             </div>
-            {quantity > 1 && !soldOut ? (
-              <p className="num text-sm text-graphite">
-                Subtotal for {quantity}:{" "}
-                <span className="font-semibold text-ink">{formatMoney(subtotal, settings.currency)}</span>
-              </p>
-            ) : null}
+            <Button
+              size="lg"
+              onClick={goToOrder}
+              disabled={soldOut}
+              className="w-full text-xl"
+              icon={soldOut ? undefined : <Icon name="cash" size={22} />}
+            >
+              {soldOut ? "স্টক শেষ" : "অর্ডার করুন"}
+            </Button>
             <ContactActions />
-            {settings.codEnabled && !trust.some((t) => t.icon === "cash") ? (
-              <p className="flex items-center gap-2 text-sm text-graphite">
-                <Icon name="cash" size={18} className="text-champagne-ink" />
-                Cash on delivery — pay when the watch arrives.
-              </p>
-            ) : null}
           </div>
 
+          {/* Delivery & payment at a glance */}
+          {zones.length || settings.codEnabled ? (
+            <div className="mt-5 grid gap-2.5 rounded-[var(--radius-md)] bg-linen p-4 sm:p-5">
+              {settings.codEnabled ? (
+                <p className="flex items-center gap-3 text-[0.95rem] font-semibold text-ink">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-champagne-ink">
+                    <Icon name="cash" size={18} />
+                  </span>
+                  ক্যাশ অন ডেলিভারি — পণ্য হাতে পেয়ে টাকা দিন
+                </p>
+              ) : null}
+              {zones.length ? (
+                <div className="flex items-start gap-3 text-[0.95rem] text-graphite">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-champagne-ink">
+                    <Icon name="truck" size={18} />
+                  </span>
+                  <ul className="grid gap-0.5 pt-1.5">
+                    {zones.map((z) => (
+                      <li key={z.id} className="num">
+                        ডেলিভারি চার্জ <span lang={langOf(z.label)}>({z.label})</span>:{" "}
+                        <span className="font-bold text-ink">{z.fee === 0 ? "ফ্রি" : money(z.fee)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
           {product.highlights.length ? (
-            <ul className="mt-7 grid grid-cols-1 gap-2.5 rounded-[var(--radius-md)] bg-porcelain/80 p-4 ring-1 ring-rule-soft min-[420px]:grid-cols-2 sm:p-5">
+            <ul className="mt-5 grid grid-cols-1 gap-2.5 min-[420px]:grid-cols-2">
               {product.highlights.map((h) => (
-                <li key={h} lang={langOf(h)} className="flex items-start gap-2.5 text-sm text-ink">
-                  <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-champagne/15 text-champagne-ink">
-                    <Icon name="check" size={13} strokeWidth={2} />
+                <li key={h} lang={langOf(h)} className="flex items-start gap-2.5 text-[0.95rem] text-ink">
+                  <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-champagne text-white">
+                    <Icon name="check" size={12} strokeWidth={2.5} />
                   </span>
                   {h}
                 </li>
@@ -120,9 +135,13 @@ export function Hero() {
           ) : null}
 
           {trust.length ? (
-            <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <ul className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {trust.map((t) => (
-                <li key={t.title} className="flex items-center gap-2.5 text-[0.8rem] leading-snug text-graphite sm:flex-col sm:items-start sm:gap-1.5">
+                <li
+                  key={t.title}
+                  lang={langOf(t.title)}
+                  className="flex items-center gap-2.5 rounded-[var(--radius-sm)] border border-rule bg-white px-3 py-2.5 text-sm font-medium leading-snug text-graphite sm:flex-col sm:items-start sm:gap-1.5"
+                >
                   <Icon name={t.icon} size={20} className="shrink-0 text-champagne-ink" />
                   {t.title}
                 </li>
@@ -132,9 +151,9 @@ export function Hero() {
 
           <a
             href="#details"
-            className="mt-7 inline-flex items-center gap-2 self-start text-sm font-semibold text-ink underline-offset-4 hover:underline"
+            className="mt-6 inline-flex items-center gap-2 self-start text-[0.95rem] font-semibold text-champagne-ink underline-offset-4 hover:underline"
           >
-            See all features
+            সব বৈশিষ্ট্য দেখুন
             <Icon name="arrow-right" size={14} className="rotate-90" />
           </a>
         </div>

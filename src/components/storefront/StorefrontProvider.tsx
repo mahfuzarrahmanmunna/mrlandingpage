@@ -53,7 +53,7 @@ export function StorefrontProvider({
       if (key === variantKey) return;
       setVariantKeyState(key);
       const selected = product.variants.find((candidate) => candidate.key === key);
-      if (connected && !product.isDemo && selected) {
+      if (connected && selected) {
         trackEcommerceEvent("select_item", {
           item_list_id: "editions",
           item_list_name: "Watch editions",

@@ -24,8 +24,8 @@ export async function POST(req: Request) {
     return errorJson(422, "Please check the highlighted fields.", { fields: fieldErrors(parsed.error) });
   }
   const input = parsed.data;
-  if (input.company || (input.elapsedMs !== undefined && input.elapsedMs < 2000)) {
-    return errorJson(422, "We couldn't verify this submission. Please try again.");
+  if (input.company || (input.elapsedMs !== undefined && input.elapsedMs < 1500)) {
+    return errorJson(422, "আপনার অনুরোধটি যাচাই করা যায়নি। কয়েক সেকেন্ড পর আবার চেষ্টা করুন।");
   }
   if (!process.env.MONGODB_URI) {
     return errorJson(503, "Enquiries are not available yet. Please contact us directly.");

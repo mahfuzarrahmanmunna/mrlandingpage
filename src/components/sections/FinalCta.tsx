@@ -4,34 +4,34 @@ import { Icon } from "@/components/ui/Icon";
 import type { ProductImage } from "@/lib/types";
 
 /** Section 8a — a final, calm invitation back to the order form. */
-export function FinalCta({ title, image }: { title: string; image?: ProductImage }) {
+export function FinalCta({ title, image, cod }: { title: string; image?: ProductImage; cod?: boolean }) {
   return (
-    <section aria-labelledby="final-cta-title" className="relative isolate overflow-hidden border-t border-rule">
-      <div className="mx-auto grid w-full max-w-[1360px] items-center gap-10 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
+    <section aria-labelledby="final-cta-title" className="relative isolate overflow-hidden bg-champagne text-white">
+      <div className="mx-auto grid w-full max-w-[1200px] items-center gap-10 px-4 py-14 sm:px-8 lg:grid-cols-12 lg:px-10 lg:py-20">
         <div className="lg:col-span-7">
-          <p className="label text-champagne-ink" data-reveal>
+          <p className="text-[0.95rem] font-semibold text-white/85" data-reveal>
             {title}
           </p>
-          <h2 id="final-cta-title" className="display mt-5 text-[clamp(3rem,9vw,7rem)] text-ink" data-reveal>
-            Wear it
-            <br />
-            <span className="italic text-graphite">with intent.</span>
+          <h2 id="final-cta-title" className="display mt-3 text-[clamp(2rem,6vw,3.5rem)] text-white" data-reveal>
+            আজই অর্ডার করুন
           </h2>
-          <div className="mt-10 flex flex-wrap gap-3" data-reveal>
-            <a href="#order" className={buttonClass("primary", "lg")}>
-              <span>Order now</span>
-              <Icon name="arrow-right" size={16} className="transition-transform group-hover:translate-x-1" />
+          <p className="mt-3 max-w-lg text-lg leading-relaxed text-white/90" data-reveal>
+            ঘরে বসেই ঘড়িটি হাতে পান।{cod ? " পণ্য হাতে পেয়ে টাকা পরিশোধ করুন।" : ""}
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3" data-reveal>
+            <a href="#order" className={buttonClass("ghost", "lg", "border-white bg-white text-champagne-ink hover:bg-champagne-soft")}>
+              <span>অর্ডার করুন</span>
+              <Icon name="arrow-right" size={18} className="transition-transform group-hover:translate-x-1" />
             </a>
-            <a href="#editions" className={buttonClass("secondary", "lg")}>
-              <span>Compare editions</span>
+            <a href="#editions" className={buttonClass("ghost", "lg", "border-white/70 bg-transparent text-white hover:border-white hover:text-white")}>
+              <span>রঙ দেখুন</span>
             </a>
           </div>
         </div>
         {image ? (
           <div className="relative mx-auto aspect-square w-full max-w-md lg:col-span-5">
-            <div aria-hidden className="absolute inset-[6%] rounded-full border border-rule" />
-            <div aria-hidden className="absolute inset-[14%] rounded-full border border-dashed border-rule" />
-            <div className="absolute inset-[18%] overflow-hidden rounded-full shadow-lift ring-1 ring-rule-soft">
+            <div aria-hidden className="absolute inset-[8%] rounded-full bg-white/15" />
+            <div className="absolute inset-[16%] overflow-hidden rounded-full bg-white shadow-lift ring-4 ring-white">
               <Image
                 src={image.url}
                 alt=""

@@ -12,6 +12,7 @@ import type { OrderRequest } from "@/lib/validation/order";
 
 export type OrderErrorCode =
   | "STORE_NOT_CONNECTED"
+  | "RATE_LIMITED"
   | "STORE_NOT_READY"
   | "PRODUCT_UNAVAILABLE"
   | "VARIANT_UNAVAILABLE"
@@ -97,7 +98,12 @@ async function restoreStock(productId: string, variantKey: string, quantity: num
   );
 }
 
-export type CreateOrderContext = { ipHash?: string; userAgent?: string };
+export type CreateOrderContext = {
+  ipHash?: string;
+  userAgent?: string;
+  /** Awaited after the read-only lookups and before anything is written (e.g. a rate-limit check). */
+  beforeWrite?: Promise<void>;
+};
 export type CreateOrderResult = { created: boolean; confirmation: OrderConfirmation };
 
 /**
@@ -112,12 +118,14 @@ export async function createOrder(input: OrderRequest, ctx: CreateOrderContext =
 
   const accessToken = deriveAccessToken(input.idempotencyKey);
 
-  // 1. Idempotency: a retried submission returns the original order.
-  const existing = await Order.findOne({ idempotencyKey: input.idempotencyKey }).lean();
+  // 1. Idempotency (a retried submission returns the original order) and
+  // 2. live product/settings (never the cached page data) — fetched in parallel.
+  const [existing, { product, settings }] = await Promise.all([
+    Order.findOne({ idempotencyKey: input.idempotencyKey }).lean(),
+    loadStorefrontLive(),
+  ]);
+  await ctx.beforeWrite;
   if (existing) return { created: false, confirmation: toConfirmation(existing, accessToken) };
-
-  // 2. Live product/settings (never the cached page data).
-  const { product, settings } = await loadStorefrontLive();
   if (!product || product.id !== input.productId) {
     throw new OrderError("PRODUCT_UNAVAILABLE", "This watch is no longer available.", 409);
   }

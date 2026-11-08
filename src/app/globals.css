@@ -1,35 +1,39 @@
 @import "tailwindcss";
 
 /*
- * MR Imperial design tokens — light editorial palette.
- * Warm ivory paper, porcelain surfaces, ink typography, brushed-steel neutrals
- * and a restrained champagne accent. Change brand colours here only.
+ * MR Imperial design tokens — bright, friendly storefront palette.
+ * White page, soft cool-grey surfaces, slate typography, a fresh green
+ * call-to-action and a warm orange "offer" accent. Change brand colours here only.
+ * (Token names are kept for compatibility: "champagne" is now the brand green.)
  */
 :root {
-  --ivory: #f6f2ea;
-  --porcelain: #fbf9f4;
-  --linen: #eee7da;
-  --sand: #e4d9c6;
-  --rule: #ddd3c2;
-  --rule-soft: #e9e2d5;
-  --steel: #a7a39b;
-  --mist: #7d766b;
-  --graphite: #4a443b;
-  --ink: #17140f;
+  --ivory: #ffffff;
+  --porcelain: #ffffff;
+  --linen: #f3f6f9;
+  --sand: #e8eef4;
+  --rule: #dfe5ec;
+  --rule-soft: #edf1f5;
+  --steel: #a3adba;
+  --mist: #64707f;
+  --graphite: #3b4554;
+  --ink: #111827;
 
-  --champagne: #b8955c;
-  --champagne-soft: #d9c39b;
-  --champagne-ink: #7a5a2b; /* accent used for text: AA on ivory */
+  --champagne: #16a34a;
+  --champagne-soft: #dcfce7;
+  --champagne-ink: #15803d; /* brand green used for text: AA on white */
 
-  --success: #3e6a4d;
-  --success-soft: #e3ece2;
-  --danger: #9c3a2b;
-  --danger-soft: #f4e2dc;
+  --offer: #ea580c;
+  --offer-soft: #fff1e6;
 
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --shadow-soft: 0 1px 0 rgba(23, 20, 15, 0.04), 0 18px 40px -24px rgba(23, 20, 15, 0.28);
-  --shadow-lift: 0 30px 80px -40px rgba(23, 20, 15, 0.45);
+  --success: #15803d;
+  --success-soft: #e8f8ee;
+  --danger: #dc2626;
+  --danger-soft: #fdecec;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --shadow-soft: 0 1px 2px rgba(17, 24, 39, 0.04), 0 8px 24px -12px rgba(17, 24, 39, 0.12);
+  --shadow-lift: 0 18px 50px -24px rgba(17, 24, 39, 0.25);
   --header-h: 64px;
 }
 
@@ -47,18 +51,21 @@
   --color-champagne: var(--champagne);
   --color-champagne-soft: var(--champagne-soft);
   --color-champagne-ink: var(--champagne-ink);
+  --color-offer: var(--offer);
+  --color-offer-soft: var(--offer-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
 
-  --font-serif: var(--font-display), var(--font-bengali), "Cormorant Garamond", Georgia, serif;
+  /* Headings use the same friendly sans as body text — easier to read on phones. */
+  --font-serif: var(--font-body), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-body), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
 
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);
 
-  --tracking-label: 0.22em;
+  --tracking-label: 0.02em;
 }
 
 html {
@@ -118,17 +125,29 @@ html.motion-ready [data-reveal="fade"] {
 @layer components {
   .label {
     font-family: var(--font-sans);
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
   }
 
   .display {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    letter-spacing: -0.015em;
-    line-height: 0.95;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  /* Small pill used for section eyebrows. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    background: var(--champagne-soft);
+    color: var(--champagne-ink);
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
   }
 
   .hairline {
@@ -137,16 +156,11 @@ html.motion-ready [data-reveal="fade"] {
   }
 
   .paper {
-    background-color: var(--porcelain);
-    background-image:
-      radial-gradient(120% 80% at 80% 0%, rgba(217, 195, 155, 0.18), transparent 60%),
-      radial-gradient(90% 60% at 0% 100%, rgba(167, 163, 155, 0.12), transparent 60%);
+    background-color: var(--linen);
   }
 
   .brushed {
-    background:
-      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0) 0 2px, rgba(255, 255, 255, 0.35) 2px 3px),
-      linear-gradient(180deg, #f3eee5, #e7dfd1);
+    background: linear-gradient(180deg, #f7f9fb, #eef2f6);
   }
 
   .num {

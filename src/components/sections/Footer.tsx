@@ -24,16 +24,16 @@ export function Footer({ settings, year, enquiry }: { settings: PublicSettings; 
   const wa = contact.whatsapp ? whatsappHref(contact.whatsapp, `Hello ${settings.brandName}`) : null;
   const tel = contact.phone ? telHref(contact.phone) : null;
   const policyList = [
-    ["Delivery", policies.shipping],
-    ["Returns & exchanges", policies.returns],
-    ["Warranty", policies.warranty],
-    ["Privacy", policies.privacy],
+    ["ডেলিভারি নীতি", policies.shipping],
+    ["রিটার্ন ও এক্সচেঞ্জ", policies.returns],
+    ["ওয়ারেন্টি", policies.warranty],
+    ["গোপনীয়তা নীতি", policies.privacy],
   ].filter(([, body]) => body) as [string, string][];
   const socials = SOCIAL.filter((s) => social[s]);
 
   return (
-    <footer id="site-footer" className="border-t border-ink/80 bg-ivory">
-      <div id="contact" className="mx-auto grid w-full max-w-[1360px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-24">
+    <footer id="site-footer" lang="bn" className="border-t border-rule bg-linen">
+      <div id="contact" className="mx-auto grid w-full max-w-[1200px] gap-12 px-4 py-14 sm:px-8 lg:grid-cols-12 lg:px-10 lg:py-20">
         <div className="lg:col-span-4">
           <Wordmark brandName={settings.brandName} logoUrl={settings.logoUrl} />
           <ul className="mt-8 space-y-3 text-sm">
@@ -69,7 +69,7 @@ export function Footer({ settings, year, enquiry }: { settings: PublicSettings; 
                     href={social[s]}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="grid size-11 place-items-center rounded-full border border-rule text-graphite transition hover:border-ink hover:text-ink"
+                    className="grid size-11 place-items-center rounded-full bg-white text-graphite shadow-soft transition hover:text-champagne-ink"
                     aria-label={`${settings.brandName} on ${s[0]!.toUpperCase()}${s.slice(1)}`}
                   >
                     <Icon name={s} size={18} />
@@ -83,8 +83,8 @@ export function Footer({ settings, year, enquiry }: { settings: PublicSettings; 
         <div className="lg:col-span-4">
           {enquiry ? (
             <>
-              <p className="label text-mist">Have a question?</p>
-              <p className="mt-3 font-serif text-2xl text-ink">Leave your number — we&rsquo;ll call you back.</p>
+              <p className="label text-champagne-ink">কোনো প্রশ্ন আছে?</p>
+              <p className="mt-2 text-xl font-bold text-ink">আপনার নম্বর দিন — আমরা কল করব।</p>
               <div className="mt-6">{enquiry}</div>
             </>
           ) : null}
@@ -93,7 +93,7 @@ export function Footer({ settings, year, enquiry }: { settings: PublicSettings; 
         <div className="lg:col-span-4">
           {policyList.length ? (
             <>
-              <p className="label text-mist">Policies</p>
+              <p className="label text-champagne-ink">নীতিমালা</p>
               <div className="mt-3 border-t border-rule">
                 {policyList.map(([title, body]) => (
                   <Policy key={title} title={title} body={body} />
@@ -104,11 +104,11 @@ export function Footer({ settings, year, enquiry }: { settings: PublicSettings; 
         </div>
       </div>
       <div className="border-t border-rule-soft">
-        <div className="mx-auto flex w-full max-w-[1360px] flex-col justify-between gap-2 px-5 py-6 text-xs text-mist sm:flex-row sm:px-8 lg:px-12">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col justify-between gap-2 px-4 py-6 text-xs text-mist sm:flex-row sm:px-8 lg:px-10">
           <p>
-            © {year} {settings.brandName}. All rights reserved.
+            © {year} {settings.brandName}। সর্বস্বত্ব সংরক্ষিত।
           </p>
-          <p>Prices in {settings.currency.code} ({settings.currency.symbol}).</p>
+          <p>সকল দাম {settings.currency.code} ({settings.currency.symbol}) এ।</p>
         </div>
       </div>
     </footer>

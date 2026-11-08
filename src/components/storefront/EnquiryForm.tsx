@@ -29,7 +29,7 @@ export function EnquiryForm() {
       ...values,
       interest: `${product.title} — ${variant.name}`,
       attribution: captureAttribution(),
-      company: (formRef.current?.elements.namedItem("company") as HTMLInputElement | null)?.value ?? "",
+      company: (formRef.current?.elements.namedItem("mri_hp_check") as HTMLInputElement | null)?.value ?? "",
       elapsedMs: Date.now() - readyAt.current,
     };
     const parsed = leadRequestSchema.safeParse(payload);
@@ -53,23 +53,23 @@ export function EnquiryForm() {
         return;
       }
       if (data?.fields) setErrors(data.fields);
-      setMessage(data?.error ?? "Could not send your enquiry.");
+      setMessage(data?.error ?? "আপনার বার্তা পাঠানো যায়নি।");
       setState("error");
     } catch {
-      setMessage("Network error — please try again.");
+      setMessage("নেটওয়ার্ক সমস্যা — আবার চেষ্টা করুন।");
       setState("error");
     }
   }
 
   if (state === "sent") {
     return (
-      <div role="status" className="flex items-start gap-3 rounded-[var(--radius-sm)] border border-rule bg-porcelain p-5">
+      <div role="status" className="flex items-start gap-3 rounded-[var(--radius-sm)] bg-champagne-soft p-5">
         <span className="grid size-9 shrink-0 place-items-center rounded-full bg-success-soft text-success">
           <Icon name="check" size={18} />
         </span>
         <div>
-          <p className="font-semibold text-ink">Thank you — we&rsquo;ll be in touch.</p>
-          <p className="mt-1 text-sm text-graphite">Our team will call you back on the number you provided.</p>
+          <p className="font-semibold text-ink">ধন্যবাদ — আমরা শীঘ্রই যোগাযোগ করব।</p>
+          <p className="mt-1 text-sm text-graphite">আপনার দেওয়া নম্বরে আমাদের টিম কল করবে।</p>
         </div>
       </div>
     );
@@ -83,9 +83,9 @@ export function EnquiryForm() {
   return (
     <form ref={formRef} onSubmit={onSubmit} noValidate className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextField label="Name" name="name" autoComplete="name" value={values.name} onChange={set("name")} error={errors.name} maxLength={80} />
+        <TextField label="নাম" name="name" autoComplete="name" value={values.name} onChange={set("name")} error={errors.name} maxLength={80} />
         <TextField
-          label="Mobile number"
+          label="মোবাইল নম্বর"
           name="phone"
           type="tel"
           inputMode="tel"
@@ -98,7 +98,7 @@ export function EnquiryForm() {
         />
       </div>
       <TextArea
-        label="Your question"
+        label="আপনার প্রশ্ন"
         name="message"
         optional
         rows={3}
@@ -108,15 +108,24 @@ export function EnquiryForm() {
         maxLength={800}
       />
       <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
-        <input type="text" name="company" tabIndex={-1} autoComplete="off" defaultValue="" />
+        <input
+          type="text"
+          name="mri_hp_check"
+          tabIndex={-1}
+          autoComplete="off"
+          data-1p-ignore
+          data-lpignore="true"
+          data-form-type="other"
+          defaultValue=""
+        />
       </div>
       {state === "error" ? (
         <p role="alert" className="text-sm text-danger">
           {message}
         </p>
       ) : null}
-      <Button type="submit" variant="secondary" loading={state === "sending"} loadingLabel="Sending…">
-        Request a call back
+      <Button type="submit" variant="secondary" loading={state === "sending"} loadingLabel="পাঠানো হচ্ছে…">
+        কল ব্যাক চাই
       </Button>
     </form>
   );
