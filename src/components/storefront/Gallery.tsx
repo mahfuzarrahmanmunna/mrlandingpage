@@ -53,8 +53,10 @@ export function Gallery() {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
 
-  // The selected colour's photos first, then the lead photo of every other
-  // colour so the slider shows the whole range. `from` marks those extras.
+  // The selected colour's lead photo first, then the lead photo of every other
+  // colour so the slider shows the whole range, and the selected colour's
+  // remaining photos (specs, water-resistance guide) last. `from` marks the
+  // other-colour extras.
   const images = useMemo(() => {
     const own = variantImages.map((img) => ({ ...img, from: undefined as PublicVariant | undefined }));
     const seen = new Set(own.map((img) => img.url));
@@ -64,7 +66,7 @@ export function Gallery() {
       seen.add(lead.url);
       return [{ ...lead, from: v }];
     });
-    return [...own, ...others];
+    return [...own.slice(0, 1), ...others, ...own.slice(1)];
   }, [variantImages, product.variants, variant.key]);
 
   // Reset to the first photo whenever the variant (and so the image set) changes.
