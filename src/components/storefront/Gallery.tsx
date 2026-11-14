@@ -37,9 +37,9 @@ type Mode = "photo" | "3d" | "video";
 const AUTOPLAY_MS = 4500;
 
 const thumbBase =
-  "relative size-16 shrink-0 snap-start overflow-hidden rounded-[var(--radius-md)] bg-linen transition sm:size-[4.5rem]";
+  "relative size-16 shrink-0 snap-start overflow-hidden rounded-[var(--radius-sm)] bg-linen transition sm:size-[4.5rem]";
 const thumbState = (active: boolean) =>
-  active ? "ring-2 ring-ink ring-offset-2 ring-offset-ivory" : "opacity-75 ring-1 ring-rule hover:opacity-100";
+  active ? "ring-2 ring-ink ring-offset-2 ring-offset-ivory" : "opacity-70 ring-1 ring-rule hover:opacity-100";
 
 export function Gallery() {
   const { product, settings, images: variantImages, variant, setVariantKey } = useStorefront();
@@ -133,7 +133,7 @@ export function Gallery() {
       }}
     >
       <div
-        className="paper relative aspect-square w-full touch-pan-y overflow-hidden rounded-[var(--radius-md)] bg-linen ring-1 ring-rule-soft"
+        className="paper relative aspect-square w-full touch-pan-y overflow-hidden rounded-[var(--radius-md)] bg-linen shadow-lift ring-1 ring-rule"
         onPointerDown={(e) => {
           if (mode !== "photo" || e.pointerType === "mouse") return;
           pointer.current = { x: e.clientX, y: e.clientY, id: e.pointerId };

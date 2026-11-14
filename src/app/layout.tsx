@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hind_Siliguri, Manrope } from "next/font/google";
+import { Cormorant_Garamond, Hind_Siliguri, Manrope } from "next/font/google";
 import { FloatingContactButtons } from "@/components/ui/FloatingContactButtons";
 import "./globals.css";
 
@@ -18,6 +18,14 @@ const bengali = Hind_Siliguri({
   display: "swap",
 });
 
+// Refined serif, used only for the wordmark and a few Latin display accents.
+const display = Cormorant_Garamond({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://mrimperial-eight.vercel.app"),
   title: { default: "MR Imperial", template: "%s" },
@@ -28,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#fbfaf7",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -36,7 +44,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${body.variable} ${bengali.variable} antialiased`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${body.variable} ${bengali.variable} ${display.variable} antialiased`}>
       <body className="min-h-dvh bg-ivory text-ink">
         {children}
         <FloatingContactButtons />

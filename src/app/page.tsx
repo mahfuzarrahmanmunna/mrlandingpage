@@ -121,7 +121,7 @@ export default async function Home() {
       {/* {product.isDemo || !connected ? <PreviewNotice /> : null} */}
       <Header brandName={settings.brandName} logoUrl={settings.logoUrl} announcement={settings.announcement} />
       <main id="main" lang="bn" className="bg-ivory">
-        <div className="relative isolate overflow-x-clip bg-[linear-gradient(180deg,#f0fdf4_0%,#ffffff_55%)]">
+        <div className="relative isolate overflow-x-clip bg-[radial-gradient(70%_60%_at_25%_0%,#f3ecdd_0%,transparent_70%),linear-gradient(180deg,#f7f3eb_0%,var(--ivory)_60%)]">
           <div className="relative z-10">
             <Hero />
           </div>

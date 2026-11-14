@@ -13,7 +13,7 @@ export function PriceDisplay({ size = "lg" }: { size?: "lg" | "md" }) {
   const off = onSale ? Math.round(((compareAtPrice! - unitPrice) / compareAtPrice!) * 100) : 0;
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-      <span className={`num font-extrabold text-champagne-ink ${size === "lg" ? "text-4xl sm:text-[2.6rem]" : "text-3xl"}`}>
+      <span className={`num font-extrabold tracking-tight text-ink ${size === "lg" ? "text-4xl sm:text-[2.5rem]" : "text-3xl"}`}>
         {money(unitPrice)}
       </span>
       {onSale ? (
@@ -23,7 +23,7 @@ export function PriceDisplay({ size = "lg" }: { size?: "lg" | "md" }) {
             {money(compareAtPrice!)}
           </span>
           {off > 0 ? (
-            <span className="num rounded-full bg-offer px-2.5 py-1 text-sm font-bold text-white">{off}% ছাড়</span>
+            <span className="num rounded-[6px] bg-offer px-2 py-1 text-[0.8rem] font-bold text-white">{off}% ছাড়</span>
           ) : null}
         </>
       ) : null}
@@ -36,7 +36,7 @@ export function StockStatus() {
   const inStock = variant.stock > 0;
   return (
     <p
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold ${
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.85rem] font-semibold ${
         inStock ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
       }`}
       aria-live="polite"
@@ -58,7 +58,7 @@ export function QuantityStepper({ id = "qty" }: { id?: string }) {
   const { quantity, setQuantity, maxQuantity } = useStorefront();
   const disabled = maxQuantity < 1;
   return (
-    <div className="inline-flex items-center overflow-hidden rounded-[var(--radius-sm)] border border-rule bg-white">
+    <div className="inline-flex items-center overflow-hidden rounded-full border border-rule bg-white">
       <button
         type="button"
         onClick={() => setQuantity(quantity - 1)}
@@ -102,8 +102,8 @@ export function VariantSwatches() {
   if (product.variants.length < 2) return null;
   return (
     <fieldset>
-      <legend className="mb-3 text-[0.95rem] font-semibold text-graphite">
-        রঙ বাছাই করুন: <span className="text-champagne-ink">{variant.name}</span>
+      <legend className="mb-3 text-[0.95rem] text-graphite">
+        রঙ: <span className="font-semibold text-ink">{variant.name}</span>
       </legend>
       <div className="flex flex-wrap gap-2">
         {product.variants.map((v) => {
@@ -113,8 +113,8 @@ export function VariantSwatches() {
               key={v.key}
               className={`relative inline-flex min-h-11 items-center gap-2.5 rounded-full border py-1.5 pl-1.5 pr-3 text-sm sm:pr-4 transition ${
                 selected
-                  ? "border-champagne bg-champagne-soft text-ink ring-1 ring-champagne"
-                  : "border-rule bg-white text-graphite hover:border-champagne"
+                  ? "border-ink bg-white text-ink ring-1 ring-ink"
+                  : "border-rule bg-white text-graphite hover:border-steel"
               } ${v.available ? "cursor-pointer" : "cursor-not-allowed opacity-50"} has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink`}
             >
               <input
@@ -185,9 +185,9 @@ export function ContactActions({ compact = false }: { compact?: boolean }) {
       {phone ? (
         <LinkButton
           href={phone}
-          variant="ghost"
+          variant="secondary"
           size={compact ? "sm" : "md"}
-          className="min-w-0 border-2 border-champagne px-3 text-champagne-ink"
+          className="min-w-0 px-3"
           onClick={() => trackEvent("contact", { contact_method: "phone" })}
           icon={<Icon name="phone" size={18} />}
         >

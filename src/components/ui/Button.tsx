@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "ghost" | "quiet";
+type Variant = "primary" | "secondary" | "ghost" | "quiet" | "gold" | "outline-light";
 type Size = "md" | "lg" | "sm";
 
 const base =
@@ -9,10 +9,13 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-champagne text-white hover:bg-champagne-ink shadow-[0_10px_24px_-12px_rgba(22,163,74,0.7)] hover:shadow-[0_14px_30px_-12px_rgba(22,163,74,0.75)]",
-  secondary: "border-2 border-champagne text-champagne-ink bg-white hover:bg-champagne-soft",
-  ghost: "border border-rule bg-white text-ink hover:border-champagne hover:text-champagne-ink",
+    "bg-ink text-white shadow-[inset_0_-2px_0_0_var(--champagne),0_12px_28px_-14px_rgba(21,19,15,0.6)] hover:bg-night-soft hover:shadow-[inset_0_-2px_0_0_var(--champagne-light),0_16px_32px_-14px_rgba(21,19,15,0.7)]",
+  secondary: "border border-ink text-ink bg-white hover:bg-ink hover:text-white",
+  ghost: "border border-rule bg-white text-ink hover:border-ink",
   quiet: "text-ink underline-offset-[6px] hover:underline",
+  /* For dark sections. */
+  gold: "bg-champagne-light text-night hover:bg-white shadow-[0_12px_28px_-14px_rgba(217,181,108,0.6)]",
+  "outline-light": "border border-white/30 text-white hover:border-white hover:bg-white/5",
 };
 
 const sizes: Record<Size, string> = {

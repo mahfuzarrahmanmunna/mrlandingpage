@@ -231,7 +231,7 @@ export function OrderForm() {
 
         <fieldset className="grid gap-5" disabled={submitting}>
           <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
-            <span className="num grid size-8 place-items-center rounded-full bg-champagne text-sm text-white">1</span>
+            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">1</span>
             আপনার তথ্য
           </legend>
           <TextField
@@ -275,7 +275,7 @@ export function OrderForm() {
 
         <fieldset className="mt-8 grid gap-5" disabled={submitting}>
           <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
-            <span className="num grid size-8 place-items-center rounded-full bg-champagne text-sm text-white">2</span>
+            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">2</span>
             ডেলিভারি ঠিকানা
           </legend>
           <TextArea
@@ -372,7 +372,7 @@ export function OrderForm() {
 
         <fieldset className="mt-8" disabled={submitting}>
           <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
-            <span className="num grid size-8 place-items-center rounded-full bg-champagne text-sm text-white">3</span>
+            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">3</span>
             পেমেন্ট
           </legend>
           {paymentAvailable ? (
@@ -504,7 +504,7 @@ export function OrderForm() {
               ) : null}
               <div className="flex items-baseline justify-between border-t border-rule pt-4">
                 <dt className="text-base font-bold text-ink">সর্বমোট</dt>
-                <dd className="text-3xl font-extrabold text-champagne-ink" aria-live="polite">
+                <dd className="text-3xl font-extrabold text-ink" aria-live="polite">
                   {money(preview.total)}
                 </dd>
               </div>

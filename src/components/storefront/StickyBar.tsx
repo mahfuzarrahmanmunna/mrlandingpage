@@ -44,7 +44,7 @@ export function StickyBar() {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-white/95 shadow-[0_-8px_24px_-12px_rgba(17,24,39,0.18)] px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md transition-transform duration-500 ease-out lg:hidden ${
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-white/95 shadow-[0_-8px_24px_-12px_rgba(21,19,15,0.18)] px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md transition-transform duration-500 ease-out lg:hidden ${
         show ? "translate-y-0" : "pointer-events-none translate-y-full"
       }`}
       aria-hidden={!show}
@@ -55,7 +55,7 @@ export function StickyBar() {
           <p className="truncate text-[0.8rem] text-graphite">
             {product.title} · {variant.name}
           </p>
-          <p className="num text-xl font-extrabold leading-tight text-champagne-ink">{formatMoney(unitPrice, settings.currency)}</p>
+          <p className="num text-xl font-extrabold leading-tight text-ink">{formatMoney(unitPrice, settings.currency)}</p>
         </div>
         <Button onClick={goToOrder} disabled={variant.stock < 1} size="md" className="px-7 text-base">
           {variant.stock < 1 ? "স্টক শেষ" : "অর্ডার করুন"}

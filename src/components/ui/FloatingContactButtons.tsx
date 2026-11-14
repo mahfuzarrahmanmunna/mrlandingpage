@@ -2,7 +2,7 @@ export function FloatingContactButtons() {
   return (
     <nav
       aria-label="Contact us"
-      className="fixed bottom-24 right-4 z-50 flex flex-col gap-3 lg:bottom-5 lg:right-5"
+      className="fixed bottom-24 right-3 z-50 flex flex-col gap-2.5 sm:right-4 lg:bottom-6 lg:right-6 lg:gap-3"
     >
       <a
         href="https://wa.me/8801314181695"
@@ -10,9 +10,9 @@ export function FloatingContactButtons() {
         rel="noopener noreferrer"
         aria-label="Chat with us on WhatsApp"
         title="Chat with us on WhatsApp"
-        className="grid size-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
+        className="grid size-12 place-items-center rounded-full ring-2 ring-white/90 lg:size-14 bg-[#25D366] text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.35)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
       >
-        <svg aria-hidden="true" viewBox="0 0 32 32" className="size-8" fill="none">
+        <svg aria-hidden="true" viewBox="0 0 32 32" className="size-7 lg:size-8" fill="none">
           <path
             d="M16 3.5a12.25 12.25 0 0 0-10.6 18.4L3.8 28l6.3-1.6A12.25 12.25 0 1 0 16 3.5Z"
             stroke="currentColor"
@@ -31,9 +31,9 @@ export function FloatingContactButtons() {
         rel="noopener noreferrer"
         aria-label="Message us on Messenger"
         title="Message us on Messenger"
-        className="grid size-14 place-items-center rounded-full bg-[#0084FF] text-white shadow-lg transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0084FF]"
+        className="grid size-12 place-items-center rounded-full ring-2 ring-white/90 lg:size-14 bg-[#0084FF] text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.35)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0084FF]"
       >
-        <svg aria-hidden="true" viewBox="0 0 32 32" className="size-8" fill="none">
+        <svg aria-hidden="true" viewBox="0 0 32 32" className="size-7 lg:size-8" fill="none">
           <path
             d="M16 3.5c-7.2 0-13 5.4-13 12 0 3.6 1.8 6.8 4.7 9v4l4.3-2.4c1.3.4 2.6.6 4 .6 7.2 0 13-5.4 13-12s-5.8-12-13-12Z"
             fill="currentColor"

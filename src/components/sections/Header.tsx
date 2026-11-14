@@ -13,7 +13,7 @@ const NAV = [
   { href: "#contact", label: "যোগাযোগ" },
 ];
 
-export function Wordmark({ brandName, logoUrl }: { brandName: string; logoUrl?: string }) {
+export function Wordmark({ brandName, logoUrl, dark = false }: { brandName: string; logoUrl?: string; dark?: boolean }) {
   if (logoUrl) {
     return (
       <Image src={logoUrl} alt={brandName} width={160} height={40} className="h-8 w-auto" unoptimized={logoUrl.endsWith(".svg")} />
@@ -21,9 +21,9 @@ export function Wordmark({ brandName, logoUrl }: { brandName: string; logoUrl?: 
   }
   const [first, ...rest] = brandName.split(" ");
   return (
-    <span className="flex items-baseline gap-1.5 text-[1.1rem] font-extrabold leading-none tracking-[0.04em] text-ink uppercase sm:text-[1.3rem]">
+    <span className={`flex items-baseline gap-2 font-serif text-[1.45rem] font-bold leading-none tracking-[0.08em] uppercase sm:text-[1.7rem] ${dark ? "text-white" : "text-ink"}`}>
       <span>{first}</span>
-      {rest.length ? <span className="text-champagne-ink">{rest.join(" ")}</span> : null}
+      {rest.length ? <span className={dark ? "text-champagne-light" : "text-champagne-ink"}>{rest.join(" ")}</span> : null}
     </span>
   );
 }
@@ -49,14 +49,15 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
   return (
     <>
       {announcement ? (
-        <div className="bg-champagne px-4 py-2 text-center text-[0.85rem] font-semibold text-white">
+        <div lang="bn" className="bg-night px-4 py-2.5 text-center text-[0.85rem] font-medium tracking-wide text-white/90">
+          <span aria-hidden className="mr-2 inline-block size-1.5 -translate-y-px rounded-full bg-champagne-light align-middle" />
           {announcement}
         </div>
       ) : null}
       <header
         lang="bn"
         className={`sticky top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
-          scrolled || open ? "border-b border-rule bg-white/95 shadow-soft backdrop-blur-md" : "border-b border-transparent bg-transparent"
+          scrolled || open ? "border-b border-rule bg-ivory/90 shadow-soft backdrop-blur-md" : "border-b border-rule-soft bg-ivory"
         }`}
       >
         <div className="mx-auto flex h-[var(--header-h)] w-full max-w-[1360px] items-center justify-between gap-3 px-4 sm:gap-6  sm:px-8 lg:px-12">
@@ -65,12 +66,12 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
           </a>
 
           <nav aria-label="Page sections" className="hidden lg:block">
-            <ul className="flex items-center gap-9">
+            <ul className="flex items-center gap-8">
               {NAV.slice(1).map((n) => (
                 <li key={n.href}>
                   <a
                     href={n.href}
-                    className="inline-flex min-h-11 items-center text-[0.95rem] font-semibold text-graphite transition-colors hover:text-champagne-ink"
+                    className="relative inline-flex min-h-11 items-center text-[0.95rem] font-medium text-graphite transition-colors after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-champagne after:transition-transform after:duration-300 hover:text-ink hover:after:scale-x-100"
                   >
                     {n.label}
                   </a>
@@ -85,7 +86,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
             </a>
             <button
               type="button"
-              className="grid size-11 place-items-center text-ink lg:hidden"
+              className="grid size-11 place-items-center rounded-full text-ink transition hover:bg-linen lg:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? "মেনু বন্ধ করুন" : "মেনু খুলুন"}
@@ -105,7 +106,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
         <nav
           id="mobile-nav"
           aria-label="Page sections"
-          className={`overflow-hidden border-t border-rule-soft bg-white transition-[max-height,opacity] duration-500 lg:hidden ${
+          className={`overflow-hidden border-t border-rule-soft bg-ivory transition-[max-height,opacity] duration-500 lg:hidden ${
             open ? "max-h-96 opacity-100" : "pointer-events-none max-h-0 opacity-0"
           }`}
           inert={!open}

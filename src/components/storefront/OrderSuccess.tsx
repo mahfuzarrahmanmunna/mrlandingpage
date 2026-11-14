@@ -20,7 +20,7 @@ export function OrderSuccess({ order, onContinue }: { order: OrderConfirmation; 
     <div className="mx-auto max-w-3xl" role="status" aria-live="polite">
       <div className="rounded-[var(--radius-md)] border-2 border-champagne bg-white p-6 shadow-lift sm:p-10">
         <div className="flex items-center gap-3 text-success">
-          <span className="grid size-12 place-items-center rounded-full bg-champagne text-white">
+          <span className="grid size-12 place-items-center rounded-full bg-success text-white">
             <Icon name="check" size={24} strokeWidth={2.5} />
           </span>
           <p className="text-lg font-bold">{isCod ? "অর্ডার গ্রহণ করা হয়েছে" : order.paymentStatus === "paid" ? "পেমেন্ট সম্পন্ন হয়েছে" : "অর্ডার সম্পন্ন হয়েছে"}</p>

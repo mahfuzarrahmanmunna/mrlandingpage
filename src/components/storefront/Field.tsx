@@ -9,8 +9,8 @@ type Common = {
 };
 
 const inputCls = (error?: string) =>
-  `peer block w-full rounded-[var(--radius-sm)] border bg-white px-4 text-base text-ink placeholder:text-steel transition-[border-color,box-shadow] duration-200 outline-none focus:border-champagne focus:shadow-[0_0_0_3px_rgba(22,163,74,0.15)] ${
-    error ? "border-danger focus:border-danger focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]" : "border-rule hover:border-steel"
+  `peer block w-full rounded-[var(--radius-sm)] border bg-white px-4 text-base text-ink placeholder:text-steel transition-[border-color,box-shadow] duration-200 outline-none focus:border-champagne focus:shadow-[0_0_0_3px_rgba(160,122,53,0.18)] ${
+    error ? "border-danger focus:border-danger focus:shadow-[0_0_0_3px_rgba(196,38,29,0.12)]" : "border-rule hover:border-steel"
   }`;
 
 function Meta({ name, error, hint }: { name: string; error?: string; hint?: ReactNode }) {

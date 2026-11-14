@@ -1,40 +1,43 @@
 @import "tailwindcss";
 
 /*
- * MR Imperial design tokens — bright, friendly storefront palette.
- * White page, soft cool-grey surfaces, slate typography, a fresh green
- * call-to-action and a warm orange "offer" accent. Change brand colours here only.
- * (Token names are kept for compatibility: "champagne" is now the brand green.)
+ * MR Imperial design tokens — "noir & gold" watch-boutique palette.
+ * Warm ivory surfaces, near-black typography and CTAs, a restrained brushed-gold
+ * accent and a deep red reserved for offers. Change brand colours here only.
+ * (Token names are kept for compatibility: "champagne" is the brand gold.)
  */
 :root {
-  --ivory: #ffffff;
+  --ivory: #fbfaf7;
   --porcelain: #ffffff;
-  --linen: #f3f6f9;
-  --sand: #e8eef4;
-  --rule: #dfe5ec;
-  --rule-soft: #edf1f5;
-  --steel: #a3adba;
-  --mist: #64707f;
-  --graphite: #3b4554;
-  --ink: #111827;
+  --linen: #f5f2ec;
+  --sand: #ebe5d9;
+  --rule: #e3ddd1;
+  --rule-soft: #efebe3;
+  --steel: #a7a194;
+  --mist: #6b665b;
+  --graphite: #3f3b33;
+  --ink: #15130f;
+  --night: #0f0e0b;
+  --night-soft: #1c1a15;
 
-  --champagne: #16a34a;
-  --champagne-soft: #dcfce7;
-  --champagne-ink: #15803d; /* brand green used for text: AA on white */
+  --champagne: #a07a35;
+  --champagne-soft: #f6efe0;
+  --champagne-ink: #80601f; /* gold used for text: AA on white and ivory */
+  --champagne-light: #d9b56c; /* gold used on dark backgrounds */
 
-  --offer: #ea580c;
-  --offer-soft: #fff1e6;
+  --offer: #b42318;
+  --offer-soft: #fdecea;
 
   --success: #15803d;
-  --success-soft: #e8f8ee;
-  --danger: #dc2626;
+  --success-soft: #e9f6ee;
+  --danger: #c4261d;
   --danger-soft: #fdecec;
 
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --shadow-soft: 0 1px 2px rgba(17, 24, 39, 0.04), 0 8px 24px -12px rgba(17, 24, 39, 0.12);
-  --shadow-lift: 0 18px 50px -24px rgba(17, 24, 39, 0.25);
-  --header-h: 64px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --shadow-soft: 0 1px 2px rgba(21, 19, 15, 0.04), 0 10px 28px -16px rgba(21, 19, 15, 0.16);
+  --shadow-lift: 0 24px 60px -28px rgba(21, 19, 15, 0.35);
+  --header-h: 68px;
 }
 
 @theme inline {
@@ -51,6 +54,9 @@
   --color-champagne: var(--champagne);
   --color-champagne-soft: var(--champagne-soft);
   --color-champagne-ink: var(--champagne-ink);
+  --color-champagne-light: var(--champagne-light);
+  --color-night: var(--night);
+  --color-night-soft: var(--night-soft);
   --color-offer: var(--offer);
   --color-offer-soft: var(--offer-soft);
   --color-success: var(--success);
@@ -58,8 +64,8 @@
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
 
-  /* Headings use the same friendly sans as body text — easier to read on phones. */
-  --font-serif: var(--font-body), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
+  /* Serif only for the Latin wordmark/numerals accents; Bangla falls back to Hind Siliguri. */
+  --font-serif: var(--font-display), var(--font-bengali), ui-serif, Georgia, serif;
   --font-sans: var(--font-body), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
 
   --shadow-soft: var(--shadow-soft);
@@ -137,17 +143,51 @@ html.motion-ready [data-reveal="fade"] {
     line-height: 1.15;
   }
 
-  /* Small pill used for section eyebrows. */
+  /* Section eyebrow: small gold label with a leading rule. */
   .eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    border-radius: 999px;
-    background: var(--champagne-soft);
+    gap: 0.75rem;
     color: var(--champagne-ink);
-    padding: 0.35rem 0.85rem;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+  }
+  .on-dark .eyebrow,
+  .eyebrow.on-dark {
+    color: var(--champagne-light);
+  }
+
+  /* Section heading sizes, shared so every section has the same rhythm. */
+  .h-section {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    font-size: clamp(1.75rem, 4.2vw, 2.6rem);
+    text-wrap: balance;
+  }
+
+  /* Gold accent text inside headings. */
+  .accent {
+    color: var(--champagne-ink);
+  }
+  .on-dark .accent {
+    color: var(--champagne-light);
+  }
+
+  /* Bordered white panel. */
+  .panel {
+    background: var(--porcelain);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
   }
 
   .hairline {
@@ -160,7 +200,15 @@ html.motion-ready [data-reveal="fade"] {
   }
 
   .brushed {
-    background: linear-gradient(180deg, #f7f9fb, #eef2f6);
+    background: linear-gradient(180deg, #fbfaf7, #f2eee6);
+  }
+
+  /* Subtle radial glow behind dark sections. */
+  .night-glow {
+    background:
+      radial-gradient(60% 80% at 85% 0%, rgba(217, 181, 108, 0.12), transparent 60%),
+      radial-gradient(50% 60% at 0% 100%, rgba(217, 181, 108, 0.06), transparent 60%),
+      var(--night);
   }
 
   .num {
