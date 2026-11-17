@@ -1,7 +1,7 @@
 import Script from "next/script";
 
 /** Public Meta (Facebook) Pixel ID — visible in page HTML by design. Override with NEXT_PUBLIC_META_PIXEL_ID. */
-const DEFAULT_PIXEL_ID = "1106636565534732";
+const DEFAULT_PIXEL_ID = "29198858579771011";
 
 export function metaPixelId() {
   const id = process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || DEFAULT_PIXEL_ID;
