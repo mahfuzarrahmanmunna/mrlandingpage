@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { captureAttribution } from "@/lib/attribution";
 import { checkoutAnalytics, trackEcommerceEvent, trackPurchase } from "@/lib/analytics";
-import { formatMoney } from "@/lib/format";
+import { bn, bnMoney } from "@/lib/format";
 import { calculateTotals } from "@/lib/pricing";
 import type { OrderConfirmation } from "@/lib/types";
 import { customerSchema, fieldErrors } from "@/lib/validation/order";
@@ -85,7 +85,7 @@ export function OrderForm() {
 
   const zone = zones.find((z) => z.id === values.zoneId);
   const preview = calculateTotals({ unitPrice, quantity: Math.max(1, quantity), deliveryFee: zone?.fee ?? 0 });
-  const money = (n: number) => formatMoney(n, settings.currency);
+  const money = (n: number) => bnMoney(n, settings.currency);
   const soldOut = variant.stock < 1;
   const noZones = zones.length === 0;
   const paymentAvailable = settings.codEnabled;
@@ -103,7 +103,7 @@ export function OrderForm() {
     setErrors((prev) => {
       const next = { ...prev };
       if (res.success) delete next[k];
-      else next[k] = res.error.issues[0]?.message ?? "Invalid value";
+      else next[k] = res.error.issues[0]?.message ?? "তথ্যটি সঠিক নয়।";
       return next;
     });
   };
@@ -224,14 +224,14 @@ export function OrderForm() {
           <div className="mb-6 flex gap-3 rounded-[var(--radius-sm)] bg-offer-soft px-4 py-3 text-sm text-graphite">
             <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-offer" />
             <p>
-              প্রিভিউ মোড — স্টোর ডাটাবেস এখনো যুক্ত হয়নি, তাই এই পেজ থেকে অর্ডার করা যাবে না।
+              এই পেজটি এখন শুধু দেখার জন্য — এখান থেকে অর্ডার করা যাবে না। অর্ডার করতে আমাদের কল করুন।
             </p>
           </div>
         ) : null}
 
         <fieldset className="grid gap-5" disabled={submitting}>
           <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
-            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">1</span>
+            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">১</span>
             আপনার তথ্য
           </legend>
           <TextField
@@ -251,7 +251,7 @@ export function OrderForm() {
             type="tel"
             inputMode="tel"
             autoComplete="tel"
-            placeholder="01XXXXXXXXX"
+            placeholder="যেমন: ০১৭১২৩৪৫৬৭৮"
             value={values.phone}
             onChange={set("phone")}
             onBlur={() => values.phone && validateField("phone")}
@@ -259,23 +259,11 @@ export function OrderForm() {
             hint="অর্ডার কনফার্ম করতে এই নম্বরে কল করা হবে।"
             maxLength={20}
           />
-          <TextField
-            label="ইমেইল"
-            name="email"
-            type="email"
-            autoComplete="email"
-            optional
-            value={values.email}
-            onChange={set("email")}
-            onBlur={() => values.email && validateField("email")}
-            error={errors.email}
-            maxLength={120}
-          />
         </fieldset>
 
         <fieldset className="mt-8 grid gap-5" disabled={submitting}>
           <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
-            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">2</span>
+            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">২</span>
             ডেলিভারি ঠিকানা
           </legend>
           <TextArea
@@ -372,16 +360,16 @@ export function OrderForm() {
 
         <fieldset className="mt-8" disabled={submitting}>
           <legend className="mb-5 flex items-center gap-3 text-lg font-bold text-ink">
-            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">3</span>
-            পেমেন্ট
+            <span className="num grid size-8 place-items-center rounded-full bg-ink text-sm text-champagne-light">৩</span>
+            টাকা পরিশোধ
           </legend>
           {paymentAvailable ? (
             <div className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border-2 border-champagne bg-champagne-soft px-4 py-4">
               <span className="flex items-center gap-3">
                 <Icon name="cash" className="text-champagne-ink" />
                 <span>
-                  <span className="block text-[0.95rem] font-bold text-ink">ক্যাশ অন ডেলিভারি</span>
-                  <span className="block text-sm text-graphite">পণ্য হাতে পেয়ে টাকা পরিশোধ করুন।</span>
+                  <span className="block text-[0.95rem] font-bold text-ink">হাতে পেয়ে টাকা দিন</span>
+                  <span className="block text-sm text-graphite">আগে কোনো টাকা লাগবে না। ঘড়ি হাতে পেয়ে কুরিয়ারকে টাকা দিন।</span>
                 </span>
               </span>
               <Icon name="check" size={20} strokeWidth={2.5} className="text-champagne-ink" />
@@ -451,7 +439,7 @@ export function OrderForm() {
             {soldOut ? "এই রঙটি স্টকে নেই" : `অর্ডার কনফার্ম করুন · ${money(preview.total)}`}
           </Button>
           <p id="order-form-note" className="mt-3 text-center text-xs leading-relaxed text-mist">
-            অর্ডার করার সময় সিস্টেম আপনার মোট দাম নিশ্চিত করবে।
+            অর্ডারের পর আমরা ফোন করে কনফার্ম করব।
             {settings.policies.privacy ? " আপনার তথ্য শুধু অর্ডার ও ডেলিভারির জন্য ব্যবহার করা হবে।" : null}
           </p>
         </div>
@@ -476,7 +464,6 @@ export function OrderForm() {
               <div className="min-w-0 flex-1">
                 <p className="text-xl font-bold leading-tight text-ink">{product.title}</p>
                 <p className="mt-1 text-sm text-graphite">রঙ: {variant.name}</p>
-                <p className="num mt-0.5 text-xs text-mist">SKU {variant.sku}</p>
               </div>
             </div>
 
@@ -488,7 +475,7 @@ export function OrderForm() {
             <dl className="num mt-5 space-y-3 border-t border-rule-soft pt-5 text-sm">
               <div className="flex justify-between">
                 <dt className="text-graphite">
-                  পণ্যের দাম <span className="text-mist">({quantity} × {money(unitPrice)})</span>
+                  পণ্যের দাম <span className="text-mist">({bn(quantity)} × {money(unitPrice)})</span>
                 </dt>
                 <dd className="text-ink">{money(preview.subtotal)}</dd>
               </div>

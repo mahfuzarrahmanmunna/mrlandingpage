@@ -61,11 +61,11 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
         }`}
       >
         <div className="mx-auto flex h-[var(--header-h)] w-full max-w-[1360px] items-center justify-between gap-3 px-4 sm:gap-6  sm:px-8 lg:px-12">
-          <a href="#top" className="flex min-h-11 items-center" aria-label={`${brandName} — back to top`}>
+          <a href="#top" className="flex min-h-11 items-center" aria-label={`${brandName} — উপরে যান`}>
             <Wordmark brandName={brandName} logoUrl={logoUrl} />
           </a>
 
-          <nav aria-label="Page sections" className="hidden lg:block">
+          <nav aria-label="পেজের অংশ" className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {NAV.slice(1).map((n) => (
                 <li key={n.href}>
@@ -105,7 +105,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
 
         <nav
           id="mobile-nav"
-          aria-label="Page sections"
+          aria-label="পেজের অংশ"
           className={`overflow-hidden border-t border-rule-soft bg-ivory transition-[max-height,opacity] duration-500 lg:hidden ${
             open ? "max-h-96 opacity-100" : "pointer-events-none max-h-0 opacity-0"
           }`}

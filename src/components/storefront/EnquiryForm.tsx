@@ -90,7 +90,7 @@ export function EnquiryForm() {
           type="tel"
           inputMode="tel"
           autoComplete="tel"
-          placeholder="01XXXXXXXXX"
+          placeholder="যেমন: ০১৭১২৩৪৫৬৭৮"
           value={values.phone}
           onChange={set("phone")}
           error={errors.phone}

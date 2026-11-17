@@ -12,17 +12,17 @@ const schema = z.object({
 export async function POST(req: Request) {
   const ipHash = hashIp(clientIp(req));
   const limit = await rateLimit("order-lookup", ipHash, { limit: 30, windowSec: 600 });
-  if (!limit.allowed) return errorJson(429, "Too many requests.");
+  if (!limit.allowed) return errorJson(429, "অনেকবার চেষ্টা করা হয়েছে।");
 
   const parsed = schema.safeParse(await readJson(req, 2_000).catch(() => null));
-  if (!parsed.success) return errorJson(400, "Invalid request.");
+  if (!parsed.success) return errorJson(400, "অনুরোধটি সঠিক নয়।");
 
   try {
     const order = await lookupOrder(parsed.data.orderNumber, parsed.data.token);
-    if (!order) return errorJson(404, "Order not found.");
+    if (!order) return errorJson(404, "অর্ডার পাওয়া যায়নি।");
     return json({ ok: true, order });
   } catch (err) {
     console.error("[api/orders/lookup]", (err as Error).message);
-    return errorJson(503, "Unavailable.");
+    return errorJson(503, "এখন পাওয়া যাচ্ছে না।");
   }
 }

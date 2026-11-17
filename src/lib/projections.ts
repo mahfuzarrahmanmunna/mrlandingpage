@@ -1,3 +1,4 @@
+import { CONTACT_NUMBER } from "@/lib/contact";
 import type { ProductDoc } from "@/lib/models/Product";
 import type { SiteSettingsDoc } from "@/lib/models/SiteSettings";
 import type {
@@ -89,7 +90,7 @@ export function toPublicProduct(doc: Lean<ProductDoc>): PublicProduct {
     ...(doc.modelUrl ? { modelUrl: doc.modelUrl } : {}),
     specs: specs(doc.specs),
     variants,
-    variantLabel: doc.variantLabel || "Edition",
+    variantLabel: doc.variantLabel || "রঙ",
     highlights: (doc.highlights ?? []).filter(Boolean),
     seo: {
       ...(doc.seo?.title ? { title: doc.seo.title } : {}),
@@ -124,7 +125,7 @@ function compact<T extends Record<string, unknown>>(obj: T) {
 
 export function toPublicSettings(doc: Lean<SiteSettingsDoc>): PublicSettings {
   return {
-    brandName: doc.brandName || "MR Imperial",
+    brandName: doc.brandName || "এমআর ইম্পেরিয়াল",
     ...(opt(doc.logoUrl) ? { logoUrl: opt(doc.logoUrl) } : {}),
     ...(opt(doc.announcement) ? { announcement: opt(doc.announcement) } : {}),
     hero: {
@@ -134,8 +135,8 @@ export function toPublicSettings(doc: Lean<SiteSettingsDoc>): PublicSettings {
     },
     currency: { code: doc.currency?.code || "BDT", symbol: doc.currency?.symbol || "৳" },
     contact: compact({
-      phone: opt(doc.contact?.phone),
-      whatsapp: opt(doc.contact?.whatsapp),
+      phone: opt(doc.contact?.phone) ?? CONTACT_NUMBER,
+      whatsapp: opt(doc.contact?.whatsapp) ?? CONTACT_NUMBER,
       email: opt(doc.contact?.email),
       address: opt(doc.contact?.address),
       hours: opt(doc.contact?.hours),
@@ -169,7 +170,7 @@ export function toPublicSettings(doc: Lean<SiteSettingsDoc>): PublicSettings {
     codEnabled: doc.codEnabled !== false,
     onlinePaymentEnabled: Boolean(doc.onlinePaymentEnabled),
     show3DPreview: doc.show3DPreview !== false,
-    whatsappMessage: doc.whatsappMessage || "Hello MR Imperial, I'd like to order {product} ({variant}) × {quantity}.",
+    whatsappMessage: doc.whatsappMessage || "আসসালামু আলাইকুম, আমি {product} ({variant}) — {quantity}টি অর্ডার করতে চাই।",
     maxQuantityPerOrder: doc.maxQuantityPerOrder || 5,
   };
 }

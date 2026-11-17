@@ -6,5 +6,10 @@ export const metadata: Metadata = {
 };
 
 export default function AdminRootLayout({ children }: LayoutProps<"/admin">) {
-  return children;
+  // The public site is Bangla (<html lang="bn">); the admin panel stays English.
+  return (
+    <div lang="en" className="contents">
+      {children}
+    </div>
+  );
 }

@@ -21,26 +21,26 @@ export const customerSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, "Please enter your full name.")
-    .max(80, "Name is too long."),
+    .min(2, "আপনার নাম লিখুন।")
+    .max(80, "নামটি অনেক বড় হয়ে গেছে।"),
   phone: z
     .string()
     .trim()
-    .min(1, "Please enter your mobile number.")
-    .refine((v) => normalizeBdPhone(v) !== null, "Enter a valid Bangladesh mobile number, e.g. 01712345678."),
+    .min(1, "মোবাইল নম্বর লিখুন।")
+    .refine((v) => normalizeBdPhone(v) !== null, "সঠিক মোবাইল নম্বর দিন, যেমন: ০১৭১২৩৪৫৬৭৮"),
   address: z
     .string()
     .trim()
-    .min(10, "Please enter your full delivery address (house, road, area).")
-    .max(300, "Address is too long."),
+    .min(10, "পুরো ঠিকানা লিখুন (বাসা, রোড, এলাকা)।")
+    .max(300, "ঠিকানাটি অনেক বড় হয়ে গেছে।"),
   city: z
     .string()
     .trim()
-    .min(2, "Please enter your district or city.")
-    .max(60, "District/city is too long."),
-  zoneId: z.string().trim().min(1, "Please choose a delivery area.").max(40),
+    .min(2, "জেলা বা শহরের নাম লিখুন।")
+    .max(60, "জেলা/শহরের নাম অনেক বড়।"),
+  zoneId: z.string().trim().min(1, "ডেলিভারি এলাকা বেছে নিন।").max(40),
   email: z
-    .union([z.literal(""), z.email("Enter a valid email address.").max(120)])
+    .union([z.literal(""), z.email("সঠিক ইমেইল দিন।").max(120)])
     .optional(),
   note: trimmed(500).optional(),
 });
@@ -52,12 +52,12 @@ export const customerSchema = z.object({
 export const orderRequestSchema = customerSchema.extend({
   productId: z.string().trim().min(1).max(64),
   variantKey: z.string().trim().min(1).max(64),
-  quantity: z.coerce.number().int("Quantity must be a whole number.").min(1).max(99),
+  quantity: z.coerce.number().int("পরিমাণ সঠিক নয়।").min(1).max(99),
   paymentMethod: z.enum(["cod", "online"]).default("cod"),
   idempotencyKey: z
     .string()
     .trim()
-    .regex(/^[A-Za-z0-9_-]{16,80}$/, "Invalid request key."),
+    .regex(/^[A-Za-z0-9_-]{16,80}$/, "অনুরোধটি সঠিক নয়।"),
   attribution: attributionSchema,
   /** honeypot — real users never fill this */
   company: z.string().max(200).optional(),
@@ -69,12 +69,12 @@ export type CustomerInput = z.infer<typeof customerSchema>;
 export type OrderRequest = z.infer<typeof orderRequestSchema>;
 
 export const leadRequestSchema = z.object({
-  name: z.string().trim().min(2, "Please enter your name.").max(80),
+  name: z.string().trim().min(2, "আপনার নাম লিখুন।").max(80),
   phone: z
     .string()
     .trim()
-    .refine((v) => normalizeBdPhone(v) !== null, "Enter a valid Bangladesh mobile number."),
-  email: z.union([z.literal(""), z.email("Enter a valid email address.").max(120)]).optional(),
+    .refine((v) => normalizeBdPhone(v) !== null, "সঠিক মোবাইল নম্বর দিন, যেমন: ০১৭১২৩৪৫৬৭৮"),
+  email: z.union([z.literal(""), z.email("সঠিক ইমেইল দিন।").max(120)]).optional(),
   message: z.string().trim().max(800).optional(),
   interest: trimmed(120).optional(),
   attribution: attributionSchema,

@@ -3,7 +3,10 @@
  * Accepts +8801…, 8801…, 01…, with spaces/dashes. Returns canonical 01XXXXXXXXX or null.
  */
 export function normalizeBdPhone(input: string): string | null {
-  let digits = input.replace(/[\s\-().]/g, "");
+  // Customers on a Bangla keyboard type ০১৭… — treat those digits like 017….
+  let digits = input
+    .replace(/[০-৯]/g, (d) => String(d.charCodeAt(0) - 0x09e6))
+    .replace(/[\s\-().]/g, "");
   if (digits.startsWith("+")) digits = digits.slice(1);
   if (!/^\d+$/.test(digits)) return null;
   if (digits.startsWith("880")) digits = digits.slice(2);

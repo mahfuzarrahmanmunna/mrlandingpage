@@ -12,7 +12,7 @@ import {
   VariantSwatches,
 } from "@/components/storefront/PurchaseControls";
 import { useStorefront } from "@/components/storefront/StorefrontProvider";
-import { formatMoney } from "@/lib/format";
+import { bnMoney } from "@/lib/format";
 import { langOf } from "@/lib/lang";
 
 export function Hero() {
@@ -20,7 +20,7 @@ export function Hero() {
   const title = settings.hero.headline || product.title;
   const soldOut = variant.stock < 1;
   const zones = settings.shippingZones;
-  const money = (n: number) => formatMoney(n, settings.currency);
+  const money = (n: number) => bnMoney(n, settings.currency);
 
   return (
     <section id="top" aria-labelledby="hero-title" className="relative isolate">
@@ -98,7 +98,7 @@ export function Hero() {
                 {settings.codEnabled ? (
                   <p className="flex items-center gap-3 text-[0.95rem] font-semibold text-ink">
                     <Icon name="cash" size={20} className="shrink-0 text-champagne-ink" />
-                    ক্যাশ অন ডেলিভারি — পণ্য হাতে পেয়ে টাকা দিন
+                    আগে টাকা লাগবে না — ঘড়ি হাতে পেয়ে টাকা দিন
                   </p>
                 ) : null}
                 {zones.length ? (

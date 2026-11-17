@@ -6,9 +6,11 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   return {
     name: settings.brandName,
     short_name: settings.brandName,
-    description: settings.hero.subheadline || `${settings.brandName} watches`,
+    description: settings.hero.subheadline || `${settings.brandName} — ঘড়ি`,
     start_url: "/",
     display: "browser",
+    lang: "bn",
+    dir: "ltr",
     background_color: "#f6f2ea",
     theme_color: "#f6f2ea",
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],

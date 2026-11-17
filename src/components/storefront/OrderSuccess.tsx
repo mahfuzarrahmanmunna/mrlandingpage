@@ -3,13 +3,13 @@
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { formatDateTime, formatMoney } from "@/lib/format";
+import { bnDateTime, bn, bnMoney } from "@/lib/format";
 import type { OrderConfirmation } from "@/lib/types";
 import { ContactActions } from "./PurchaseControls";
 
 export function OrderSuccess({ order, onContinue }: { order: OrderConfirmation; onContinue: () => void }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const money = (n: number) => formatMoney(n, order.currency);
+  const money = (n: number) => bnMoney(n, order.currency);
   const isCod = order.paymentMethod === "cod";
 
   useEffect(() => {
@@ -39,12 +39,12 @@ export function OrderSuccess({ order, onContinue }: { order: OrderConfirmation; 
           <div className="rounded-[var(--radius-sm)] bg-linen p-5">
             <p className="label text-mist">অর্ডার নম্বর</p>
             <p className="num mt-2 text-2xl font-extrabold tracking-wide text-ink">{order.orderNumber}</p>
-            <p className="mt-1 text-xs text-mist">{formatDateTime(order.createdAt)}</p>
+            <p className="mt-1 text-xs text-mist">{bnDateTime(order.createdAt)}</p>
           </div>
           <div className="rounded-[var(--radius-sm)] bg-linen p-5">
-            <p className="label text-mist">সর্বমোট পরিশোধ</p>
+            <p className="label text-mist">মোট টাকা</p>
             <p className="num mt-2 text-2xl font-extrabold text-champagne-ink">{money(order.total)}</p>
-            <p className="mt-1 text-xs text-mist">{isCod ? "ক্যাশ অন ডেলিভারি" : "অনলাইন পেমেন্ট"}</p>
+            <p className="mt-1 text-xs text-mist">{isCod ? "হাতে পেয়ে টাকা দেবেন" : "অনলাইনে পরিশোধ"}</p>
           </div>
         </div>
 
@@ -52,7 +52,7 @@ export function OrderSuccess({ order, onContinue }: { order: OrderConfirmation; 
           {order.items.map((item) => (
             <div key={item.sku} className="flex justify-between gap-4">
               <dt className="text-graphite">
-                {item.title} — {item.variantName} <span className="text-mist">× {item.quantity}</span>
+                {item.title} — {item.variantName} <span className="text-mist">× {bn(item.quantity)}</span>
               </dt>
               <dd className="text-ink">{money(item.lineTotal)}</dd>
             </div>

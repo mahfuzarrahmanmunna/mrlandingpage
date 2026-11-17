@@ -28,10 +28,10 @@ const display = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mrimperial-eight.vercel.app"),
-  title: { default: "MR Imperial", template: "%s" },
-  applicationName: "MR Imperial",
-  creator: "MR Imperial",
-  publisher: "MR Imperial",
+  title: { default: "এমআর ইম্পেরিয়াল", template: "%s" },
+  applicationName: "এমআর ইম্পেরিয়াল",
+  creator: "এমআর ইম্পেরিয়াল",
+  publisher: "এমআর ইম্পেরিয়াল",
   formatDetection: { telephone: false },
 };
 
@@ -44,7 +44,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${body.variable} ${bengali.variable} ${display.variable} antialiased`}>
+    <html lang="bn" data-scroll-behavior="smooth" className={`${body.variable} ${bengali.variable} ${display.variable} antialiased`}>
       <body className="min-h-dvh bg-ivory text-ink">
         {children}
         <FloatingContactButtons />

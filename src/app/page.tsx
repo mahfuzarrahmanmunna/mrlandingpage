@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if (!product) {
     return {
       title: settings.brandName,
-      description: settings.hero.subheadline || `${settings.brandName} watches.`,
+      description: settings.hero.subheadline || `${settings.brandName} — ঘড়ি।`,
       alternates: { canonical: "/" },
       robots: { index: false, follow: true },
     };
@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords: keywords(product, settings),
     alternates: { canonical: "/" },
-    category: "Watches",
+    category: "ঘড়ি",
     openGraph: {
       type: "website",
       url: "/",
@@ -45,7 +45,6 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       locale: settings.currency.code === "BDT" ? "bn_BD" : "en_US",
-      alternateLocale: ["en_US"],
       ...(product.videoUrl ? { videos: [{ url: absoluteUrl(product.videoUrl), type: "video/mp4" }] } : {}),
     },
     twitter: { card: "summary_large_image", title, description },

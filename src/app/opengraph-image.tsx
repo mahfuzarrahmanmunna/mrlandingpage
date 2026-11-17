@@ -1,7 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { ImageResponse } from "next/og";
-import { formatMoney } from "@/lib/format";
 import { shareImage } from "@/lib/seo";
 import { getStorefront } from "@/lib/storefront";
 
@@ -11,8 +10,11 @@ const MIME: Record<string, string> = { ".jpg": "image/jpeg", ".jpeg": "image/jpe
 /**
  * Share card for Facebook / WhatsApp / Messenger / X. File-based OG images take
  * priority over generateMetadata, so this card is product-aware: it uses the
- * admin-set SEO image or the first real product photo. Text stays Latin-only
- * because the default OG font has no Bengali glyphs.
+ * admin-set SEO image or the first real product photo.
+ *
+ * The card is photo-only on purpose: the site is Bangla-only, and the OG image
+ * renderer cannot shape Bangla text (joined letters come out broken). The
+ * Bangla title and price travel in the page's og:title / og:description.
  */
 export async function generateImageMetadata() {
   const { product, settings } = await getStorefront();
@@ -21,7 +23,7 @@ export async function generateImageMetadata() {
       id: "share",
       size,
       contentType: "image/png",
-      alt: product ? `${product.title} — ${settings.brandName}` : `${settings.brandName} watches`,
+      alt: product ? `${product.title} — ${settings.brandName}` : `${settings.brandName} — ঘড়ি`,
     },
   ];
 }
@@ -43,13 +45,8 @@ async function photoSrc(url: string | undefined) {
 }
 
 export default async function OpengraphImage() {
-  const { product, settings } = await getStorefront();
+  const { product } = await getStorefront();
   const photo = product ? await photoSrc(shareImage(product)) : undefined;
-  const prices = product?.variants.map((v) => v.price) ?? [];
-  const from = prices.length ? Math.min(...prices) : product?.price;
-  const movement = product?.specs.movement?.split(/\s[—(]/)[0]?.trim().toLowerCase();
-  const subtitle = `Men's ${movement && /^[\x20-\x7E]+$/.test(movement) ? `${movement} ` : ""}watch`;
-  const colours = product && product.variants.length > 1 ? product.variants.map((v) => v.name).join(" · ") : "";
 
   return new ImageResponse(
     (
@@ -58,54 +55,22 @@ export default async function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           background: "linear-gradient(135deg, #fbf9f4 0%, #f1eadf 60%, #e4d9c6 100%)",
-          color: "#17140f",
-          fontFamily: "Georgia, serif",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px", flex: 1 }}>
-          <div style={{ display: "flex", fontSize: 24, letterSpacing: 8, color: "#7a5a2b" }}>
-            {settings.brandName.toUpperCase()}
-          </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: product ? 84 : 104, lineHeight: 1 }}>{product?.title ?? "Time, quietly"}</div>
-            {product ? (
-              <div style={{ display: "flex", marginTop: 18, fontSize: 32, fontStyle: "italic", color: "#4a443b" }}>
-                {subtitle}
-              </div>
-            ) : (
-              <div style={{ fontSize: 104, lineHeight: 1, fontStyle: "italic", color: "#4a443b" }}>well kept.</div>
-            )}
-            {colours ? (
-              <div style={{ display: "flex", marginTop: 14, fontSize: 24, color: "#7d766b" }}>{colours}</div>
-            ) : null}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 24, whiteSpace: "nowrap" }}>
-            {from ? (
-              <div style={{ display: "flex", fontSize: 36, whiteSpace: "nowrap" }}>
-                {`From ${formatMoney(from, { ...settings.currency, symbol: settings.currency.code === "BDT" ? "Tk " : settings.currency.symbol })}`}
-              </div>
-            ) : null}
-            {settings.codEnabled ? (
-              <div
-                style={{
-                  display: "flex",
-                  padding: "10px 18px",
-                  border: "2px solid #b8955c",
-                  fontSize: 20,
-                  letterSpacing: 2,
-                  whiteSpace: "nowrap",
-                  color: "#7a5a2b",
-                }}
-              >
-                CASH ON DELIVERY
-              </div>
-            ) : null}
-          </div>
-        </div>
         {photo ? (
-          <img src={photo} alt="" width={560} height={630} style={{ width: 560, height: 630, objectFit: "cover" }} />
-        ) : null}
+          <img
+            src={photo}
+            alt=""
+            width={630}
+            height={630}
+            style={{ width: 630, height: 630, objectFit: "cover", borderLeft: "6px solid #b8955c", borderRight: "6px solid #b8955c" }}
+          />
+        ) : (
+          <div style={{ display: "flex", width: 220, height: 220, borderRadius: 220, border: "6px solid #b8955c" }} />
+        )}
       </div>
     ),
     size,

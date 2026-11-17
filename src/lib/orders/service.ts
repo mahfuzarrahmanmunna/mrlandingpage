@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { Lead } from "@/lib/models/Lead";
 import { Order, type OrderDoc, type OrderStatus } from "@/lib/models/Order";
 import { Product } from "@/lib/models/Product";
+import { bn } from "@/lib/format";
 import { normalizeBdPhone } from "@/lib/phone";
 import { calculateTotals } from "@/lib/pricing";
 import { loadStorefrontLive } from "@/lib/storefront-live";
@@ -112,7 +113,7 @@ export type CreateOrderResult = { created: boolean; confirmation: OrderConfirmat
  */
 export async function createOrder(input: OrderRequest, ctx: CreateOrderContext = {}): Promise<CreateOrderResult> {
   if (!process.env.MONGODB_URI) {
-    throw new OrderError("STORE_NOT_CONNECTED", "Online ordering is not available yet. Please contact us to order.", 503);
+    throw new OrderError("STORE_NOT_CONNECTED", "অনলাইনে অর্ডার এখনো চালু হয়নি। অর্ডার করতে আমাদের কল করুন।", 503);
   }
   await connectDB();
 
@@ -127,35 +128,35 @@ export async function createOrder(input: OrderRequest, ctx: CreateOrderContext =
   await ctx.beforeWrite;
   if (existing) return { created: false, confirmation: toConfirmation(existing, accessToken) };
   if (!product || product.id !== input.productId) {
-    throw new OrderError("PRODUCT_UNAVAILABLE", "This watch is no longer available.", 409);
+    throw new OrderError("PRODUCT_UNAVAILABLE", "এই ঘড়িটি এখন আর পাওয়া যাচ্ছে না।", 409);
   }
   if (settings.shippingZones.length === 0) {
-    throw new OrderError("STORE_NOT_READY", "Delivery areas are not configured yet. Please contact us to order.", 503);
+    throw new OrderError("STORE_NOT_READY", "ডেলিভারি এলাকা এখনো যোগ করা হয়নি। অর্ডার করতে আমাদের কল করুন।", 503);
   }
   const zone = settings.shippingZones.find((z) => z.id === input.zoneId);
-  if (!zone) throw new OrderError("INVALID_ZONE", "Please choose a valid delivery area.", 422, { field: "zoneId" });
+  if (!zone) throw new OrderError("INVALID_ZONE", "ডেলিভারি এলাকা বেছে নিন।", 422, { field: "zoneId" });
 
   if (input.paymentMethod === "online") {
     // No gateway is integrated yet. See README → Payments.
-    throw new OrderError("PAYMENT_UNAVAILABLE", "Online payment is not available. Please choose cash on delivery.", 422);
+    throw new OrderError("PAYMENT_UNAVAILABLE", "অনলাইন পেমেন্ট চালু নেই। পণ্য হাতে পেয়ে টাকা দিন।", 422);
   }
   if (!settings.codEnabled) {
-    throw new OrderError("PAYMENT_UNAVAILABLE", "Cash on delivery is currently unavailable.", 422);
+    throw new OrderError("PAYMENT_UNAVAILABLE", "এই মুহূর্তে অর্ডার নেওয়া যাচ্ছে না। আমাদের কল করুন।", 422);
   }
 
   const variant = product.variants.find((v) => v.key === input.variantKey);
-  if (!variant) throw new OrderError("VARIANT_UNAVAILABLE", "The selected option is no longer available.", 409);
+  if (!variant) throw new OrderError("VARIANT_UNAVAILABLE", "এই রঙটি এখন আর পাওয়া যাচ্ছে না।", 409);
   if (input.quantity > settings.maxQuantityPerOrder) {
     throw new OrderError(
       "QUANTITY_LIMIT",
-      `You can order up to ${settings.maxQuantityPerOrder} per order.`,
+      `একবারে সর্বোচ্চ ${bn(settings.maxQuantityPerOrder)}টি অর্ডার করা যাবে।`,
       422,
       { max: settings.maxQuantityPerOrder },
     );
   }
 
   const phone = normalizeBdPhone(input.phone);
-  if (!phone) throw new OrderError("INVALID_PHONE", "Enter a valid Bangladesh mobile number.", 422, { field: "phone" });
+  if (!phone) throw new OrderError("INVALID_PHONE", "সঠিক মোবাইল নম্বর দিন, যেমন: ০১৭১২৩৪৫৬৭৮", 422, { field: "phone" });
 
   const totals = calculateTotals({ unitPrice: variant.price, quantity: input.quantity, deliveryFee: zone.fee });
 
@@ -187,14 +188,14 @@ export async function createOrder(input: OrderRequest, ctx: CreateOrderContext =
     const fresh = await Product.findById(product.id, { variants: 1 }).lean();
     const fv = fresh?.variants.find((v) => v.key === variant.key);
     if (fv && fv.price !== variant.price) {
-      throw new OrderError("PRICE_CHANGED", "The price has just been updated. Please review your order.", 409, {
+      throw new OrderError("PRICE_CHANGED", "দাম এইমাত্র পরিবর্তন হয়েছে। অর্ডারটি আবার দেখে নিন।", 409, {
         price: fv.price,
       });
     }
     const available = Math.max(0, fv?.stock ?? 0);
     throw new OrderError(
       "OUT_OF_STOCK",
-      available > 0 ? `Only ${available} left for this option.` : "This option has just sold out.",
+      available > 0 ? `এই রঙের মাত্র ${bn(available)}টি বাকি আছে।` : "এই রঙটি এইমাত্র শেষ হয়ে গেছে।",
       409,
       { available },
     );

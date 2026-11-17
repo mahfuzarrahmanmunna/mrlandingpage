@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { goToOrder } from "@/components/motion/scroll";
-import { formatMoney } from "@/lib/format";
+import { bnMoney } from "@/lib/format";
 import { useStorefront } from "./StorefrontProvider";
 
 /**
@@ -55,7 +55,7 @@ export function StickyBar() {
           <p className="truncate text-[0.8rem] text-graphite">
             {product.title} · {variant.name}
           </p>
-          <p className="num text-xl font-extrabold leading-tight text-ink">{formatMoney(unitPrice, settings.currency)}</p>
+          <p className="num text-xl font-extrabold leading-tight text-ink">{bnMoney(unitPrice, settings.currency)}</p>
         </div>
         <Button onClick={goToOrder} disabled={variant.stock < 1} size="md" className="px-7 text-base">
           {variant.stock < 1 ? "স্টক শেষ" : "অর্ডার করুন"}

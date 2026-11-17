@@ -1,4 +1,5 @@
 import { Icon } from "@/components/ui/Icon";
+import { bn } from "@/lib/format";
 import { langOf } from "@/lib/lang";
 import type { Highlight, Testimonial } from "@/lib/types";
 
@@ -28,7 +29,7 @@ export function WhyChoose({ brandName, items, testimonials }: { brandName: strin
                   className="grid grid-cols-[2.75rem_1fr] items-start gap-4 border-b border-rule py-6 sm:grid-cols-[4rem_1fr_auto] sm:gap-6 sm:py-8"
                 >
                   <span className="num font-serif text-3xl font-bold leading-none text-champagne-ink sm:text-4xl" aria-hidden>
-                    {String(i + 1).padStart(2, "0")}
+                    {bn(String(i + 1).padStart(2, "0"))}
                   </span>
                   <div>
                     <h3 lang={langOf(item.title)} className="text-lg font-bold text-ink sm:text-xl">{item.title}</h3>

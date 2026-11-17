@@ -1,15 +1,17 @@
+import { CONTACT_NUMBER_DIGITS } from "@/lib/contact";
+
 export function FloatingContactButtons() {
   return (
     <nav
-      aria-label="Contact us"
+      aria-label="যোগাযোগ করুন"
       className="fixed bottom-24 right-3 z-50 flex flex-col gap-2.5 sm:right-4 lg:bottom-6 lg:right-6 lg:gap-3"
     >
       <a
-        href="https://wa.me/8801314181695"
+        href={`https://wa.me/${CONTACT_NUMBER_DIGITS}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat with us on WhatsApp"
-        title="Chat with us on WhatsApp"
+        aria-label="হোয়াটসঅ্যাপে কথা বলুন"
+        title="হোয়াটসঅ্যাপে কথা বলুন"
         className="grid size-12 place-items-center rounded-full ring-2 ring-white/90 lg:size-14 bg-[#25D366] text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.35)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
       >
         <svg aria-hidden="true" viewBox="0 0 32 32" className="size-7 lg:size-8" fill="none">
@@ -29,8 +31,8 @@ export function FloatingContactButtons() {
         href="https://www.facebook.com/messages/t/1327876683751464"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Message us on Messenger"
-        title="Message us on Messenger"
+        aria-label="মেসেঞ্জারে মেসেজ দিন"
+        title="মেসেঞ্জারে মেসেজ দিন"
         className="grid size-12 place-items-center rounded-full ring-2 ring-white/90 lg:size-14 bg-[#0084FF] text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.35)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0084FF]"
       >
         <svg aria-hidden="true" viewBox="0 0 32 32" className="size-7 lg:size-8" fill="none">

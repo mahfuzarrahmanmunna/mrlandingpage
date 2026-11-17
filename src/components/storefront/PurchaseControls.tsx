@@ -3,12 +3,12 @@
 import { LinkButton } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { trackEvent } from "@/lib/analytics";
-import { fillTemplate, formatMoney, telHref, whatsappHref } from "@/lib/format";
+import { fillTemplate, bn, bnMoney, telHref, whatsappHref } from "@/lib/format";
 import { useStorefront } from "./StorefrontProvider";
 
 export function PriceDisplay({ size = "lg" }: { size?: "lg" | "md" }) {
   const { unitPrice, compareAtPrice, settings } = useStorefront();
-  const money = (n: number) => formatMoney(n, settings.currency);
+  const money = (n: number) => bnMoney(n, settings.currency);
   const onSale = Boolean(compareAtPrice && compareAtPrice > unitPrice);
   const off = onSale ? Math.round(((compareAtPrice! - unitPrice) / compareAtPrice!) * 100) : 0;
   return (
@@ -23,7 +23,7 @@ export function PriceDisplay({ size = "lg" }: { size?: "lg" | "md" }) {
             {money(compareAtPrice!)}
           </span>
           {off > 0 ? (
-            <span className="num rounded-[6px] bg-offer px-2 py-1 text-[0.8rem] font-bold text-white">{off}% ছাড়</span>
+            <span className="num rounded-[6px] bg-offer px-2 py-1 text-[0.8rem] font-bold text-white">{bn(off)}% ছাড়</span>
           ) : null}
         </>
       ) : null}
@@ -45,7 +45,7 @@ export function StockStatus() {
       {inStock ? (
         <span className="num">
           স্টকে আছে
-          {variant.stock <= 3 ? <span> · মাত্র {variant.stock}টি বাকি</span> : null}
+          {variant.stock <= 3 ? <span> · মাত্র {bn(variant.stock)}টি বাকি</span> : null}
         </span>
       ) : (
         <span>এই মুহূর্তে স্টকে নেই</span>
@@ -153,7 +153,7 @@ export function useContactLinks() {
   const message = fillTemplate(settings.whatsappMessage, {
     product: product.title,
     variant: variant.name,
-    quantity,
+    quantity: bn(quantity),
     sku: variant.sku,
   });
   return {
@@ -177,9 +177,9 @@ export function ContactActions({ compact = false }: { compact?: boolean }) {
           className="min-w-0 border-[#25d366] bg-[#25d366] px-3 text-white hover:border-[#1ebe5b] hover:bg-[#1ebe5b] hover:text-white"
           onClick={() => trackEvent("contact", { contact_method: "whatsapp" })}
           icon={<Icon name="whatsapp" size={18} />}
-          aria-label="WhatsApp-এ অর্ডার করুন (WhatsApp খুলবে)"
+          aria-label="হোয়াটসঅ্যাপে অর্ডার করুন (হোয়াটসঅ্যাপ খুলবে)"
         >
-          WhatsApp
+          হোয়াটসঅ্যাপ
         </LinkButton>
       ) : null}
       {phone ? (

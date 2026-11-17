@@ -128,6 +128,11 @@ html.motion-ready [data-reveal="fade"] {
   transform: none;
 }
 
+/* Bangla letters join together; letter-spacing pulls them apart. */
+*:lang(bn) {
+  letter-spacing: normal !important;
+}
+
 @layer components {
   .label {
     font-family: var(--font-sans);

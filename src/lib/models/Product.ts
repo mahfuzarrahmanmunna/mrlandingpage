@@ -68,7 +68,7 @@ const ProductSchema = new Schema(
     videoUrl: { type: String, trim: true, maxlength: 600 },
     modelUrl: { type: String, trim: true, maxlength: 600 },
     specs: { type: SpecsSchema, default: {} },
-    variantLabel: { type: String, trim: true, maxlength: 40, default: "Edition" },
+    variantLabel: { type: String, trim: true, maxlength: 40, default: "রঙ" },
     variants: {
       type: [VariantSchema],
       validate: {

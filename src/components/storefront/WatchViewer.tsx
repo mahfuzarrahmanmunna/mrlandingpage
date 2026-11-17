@@ -11,6 +11,7 @@ import { Component, Suspense, useEffect, useMemo, useRef, type ReactNode } from 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Center, ContactShadows, Environment, Html, Lightformer, OrbitControls, useGLTF, useProgress } from "@react-three/drei";
 import * as THREE from "three";
+import { bn } from "@/lib/format";
 
 type Props = {
   modelUrl?: string;
@@ -37,7 +38,7 @@ function Loader() {
   return (
     <Html center>
       <div className="label whitespace-nowrap text-mist" role="status">
-        Loading 3D · {Math.round(progress)}%
+        ৩ডি লোড হচ্ছে · {bn(Math.round(progress))}%
       </div>
     </Html>
   );
@@ -203,7 +204,7 @@ export default function WatchViewer({ modelUrl, dialColor, onFail, reducedMotion
               onFail();
             });
           }}
-          aria-label={modelUrl ? "Interactive 3D model of the watch" : "Illustrative 3D watch preview"}
+          aria-label={modelUrl ? "ঘড়ির ৩ডি ছবি — ঘুরিয়ে দেখুন" : "নমুনা ৩ডি ঘড়ি"}
         >
           <ambientLight intensity={0.35} />
           <directionalLight position={[3, 4, 5]} intensity={1.4} />

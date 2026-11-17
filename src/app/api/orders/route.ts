@@ -20,14 +20,14 @@ export async function POST(req: Request) {
   try {
     body = await readJson(req, 16_000);
   } catch (err) {
-    if (err instanceof PayloadTooLargeError) return errorJson(413, "Request too large.");
-    if (err instanceof BadJsonError) return errorJson(400, "Invalid request.");
+    if (err instanceof PayloadTooLargeError) return errorJson(413, "তথ্য অনেক বেশি হয়ে গেছে।");
+    if (err instanceof BadJsonError) return errorJson(400, "অনুরোধটি সঠিক নয়।");
     throw err;
   }
 
   const parsed = orderRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return errorJson(422, "Please check the highlighted fields.", { fields: fieldErrors(parsed.error) });
+    return errorJson(422, "লাল চিহ্নিত ঘরগুলো ঠিক করুন।", { fields: fieldErrors(parsed.error) });
   }
   const input = parsed.data;
 
@@ -71,6 +71,6 @@ export async function POST(req: Request) {
       return errorJson(err.status, err.message, { code: err.code, ...err.details });
     }
     console.error("[api/orders] unexpected error:", err);
-    return errorJson(500, "We couldn't place your order right now. Please try again or contact us.");
+    return errorJson(500, "এই মুহূর্তে অর্ডার নেওয়া যায়নি। আবার চেষ্টা করুন অথবা আমাদের কল করুন।");
   }
 }

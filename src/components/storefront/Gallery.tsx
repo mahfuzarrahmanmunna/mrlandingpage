@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { bn } from "@/lib/format";
 import type { PublicVariant } from "@/lib/types";
 import { useStorefront } from "./StorefrontProvider";
 
@@ -12,7 +13,7 @@ const WatchViewer = dynamic(() => import("./WatchViewer"), {
   loading: () => (
     <div className="absolute inset-0 grid place-items-center">
       <span className="label text-mist" role="status">
-        Preparing 3D view…
+        ৩ডি ভিউ চালু হচ্ছে…
       </span>
     </div>
   ),
@@ -106,15 +107,15 @@ export function Gallery() {
   }, []);
 
   if (!current) {
-    return <div className="aspect-square w-full bg-linen" aria-label="No product image available" role="img" />;
+    return <div className="aspect-square w-full bg-linen" aria-label="ছবি নেই" role="img" />;
   }
 
   return (
     <div
       className="relative"
       role="region"
-      aria-roledescription="carousel"
-      aria-label={`${product.title} images`}
+      aria-roledescription="ছবির স্লাইড"
+      aria-label={`${product.title} — ছবি`}
       onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onFocus={(e) => e.target.matches(":focus-visible") && setFocused(true)}
@@ -182,7 +183,7 @@ export function Gallery() {
             poster={current.url}
           >
             <source src={product.videoUrl} type="video/mp4" />
-            Your browser does not support video playback.
+            আপনার ব্রাউজারে ভিডিও চলছে না।
           </video>
         ) : (
           <WatchViewer
@@ -205,7 +206,7 @@ export function Gallery() {
                 className="size-4 rounded-full ring-1 ring-black/10"
                 style={{ background: current.from.swatch ?? "var(--linen)" }}
               />
-              {current.from.name} — select this colour
+              {current.from.name} — এই রঙটি নিন
             </button>
           ) : (
             <span className="label absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-porcelain/90 py-1.5 pl-1.5 pr-3 text-[0.62rem] text-mist backdrop-blur">
@@ -214,18 +215,18 @@ export function Gallery() {
                 className="size-4 rounded-full ring-1 ring-black/10"
                 style={{ background: current.from.swatch ?? "var(--linen)" }}
               />
-              {current.from.name} · sold out
+              {current.from.name} · স্টক শেষ
             </span>
           )
         ) : null}
         {mode === "photo" && current.placeholder ? (
           <span className="label absolute left-3 top-3 rounded-full bg-porcelain/90 px-3 py-1.5 text-[0.58rem] text-mist backdrop-blur-sm">
-            Placeholder image
+            নমুনা ছবি
           </span>
         ) : null}
         {mode === "3d" && !product.modelUrl ? (
           <span className="label absolute left-3 top-3 max-w-[75%] rounded-[var(--radius-md)] bg-porcelain/90 px-3 py-1.5 text-[0.58rem] leading-relaxed text-mist backdrop-blur-sm">
-            Illustrative 3D preview — not the actual product
+            নমুনা ৩ডি ছবি — আসল পণ্য নয়
           </span>
         ) : null}
 
@@ -235,14 +236,14 @@ export function Gallery() {
               className="num absolute right-3 top-3 rounded-full bg-ink/70 px-2.5 py-1 text-[0.7rem] font-semibold text-porcelain backdrop-blur"
               aria-live="polite"
             >
-              {index + 1} / {count}
+              {bn(index + 1)} / {bn(count)}
             </p>
             {!reducedMotion ? (
               <button
                 type="button"
                 onClick={() => setStopped((v) => !v)}
                 className="absolute bottom-3 right-3 grid size-9 place-items-center rounded-full bg-ink/70 text-porcelain backdrop-blur transition hover:bg-ink/85"
-                aria-label={stopped ? "Start automatic slideshow" : "Stop automatic slideshow"}
+                aria-label={stopped ? "স্লাইড চালু করুন" : "স্লাইড থামান"}
               >
                 <Icon name={stopped ? "play" : "pause"} size={14} strokeWidth={stopped ? 0 : 2} className={stopped ? "fill-current" : undefined} />
               </button>
@@ -251,7 +252,7 @@ export function Gallery() {
               type="button"
               onClick={() => go(-1)}
               className="absolute left-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-porcelain/90 text-ink shadow-soft backdrop-blur transition hover:bg-porcelain"
-              aria-label="Previous image"
+              aria-label="আগের ছবি"
             >
               <Icon name="chevron-left" />
             </button>
@@ -259,7 +260,7 @@ export function Gallery() {
               type="button"
               onClick={() => go(1)}
               className="absolute right-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-porcelain/90 text-ink shadow-soft backdrop-blur transition hover:bg-porcelain"
-              aria-label="Next image"
+              aria-label="পরের ছবি"
             >
               <Icon name="chevron-right" />
             </button>
@@ -271,7 +272,7 @@ export function Gallery() {
       <div
         className="-mx-1 mt-3 flex snap-x gap-2.5 overflow-x-auto px-1 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="group"
-        aria-label="Choose view"
+        aria-label="ছবি বাছাই করুন"
       >
         {images.map((img, i) => (
           <button
@@ -281,7 +282,7 @@ export function Gallery() {
               setMode("photo");
               setIndex(i);
             }}
-            aria-label={`Show image ${i + 1} of ${count}`}
+            aria-label={`${bn(count)}টির মধ্যে ${bn(i + 1)} নম্বর ছবি`}
             aria-current={mode === "photo" && i === index}
             className={`${thumbBase} ${thumbState(mode === "photo" && i === index)}`}
           >
@@ -293,7 +294,7 @@ export function Gallery() {
             type="button"
             onClick={() => setMode("video")}
             aria-pressed={mode === "video"}
-            aria-label="Play product video"
+            aria-label="ভিডিও দেখুন"
             className={`${thumbBase} ${thumbState(mode === "video")}`}
           >
             <Image src={images[0]!.url} alt="" fill sizes="72px" unoptimized={isSvg(images[0]!.url)} className="object-cover" />
@@ -303,7 +304,7 @@ export function Gallery() {
               </span>
             </span>
             <span className="absolute inset-x-0 bottom-0 bg-ink/70 py-0.5 text-center text-[0.55rem] font-semibold uppercase tracking-wider text-porcelain">
-              Video
+              ভিডিও
             </span>
           </button>
         ) : null}
@@ -312,12 +313,12 @@ export function Gallery() {
             type="button"
             onClick={() => setMode("3d")}
             aria-pressed={mode === "3d"}
-            aria-label={product.modelUrl ? "View in 3D" : "Show illustrative 3D preview"}
+            aria-label={product.modelUrl ? "৩ডি-তে দেখুন" : "নমুনা ৩ডি ছবি দেখুন"}
             className={`${thumbBase} grid place-items-center bg-porcelain text-graphite ${thumbState(mode === "3d")}`}
           >
             <span className="flex flex-col items-center gap-1">
               <Icon name="cube" size={22} />
-              <span className="text-[0.6rem] font-semibold uppercase tracking-wider">3D</span>
+              <span className="text-[0.6rem] font-semibold">৩ডি</span>
             </span>
           </button>
         ) : null}

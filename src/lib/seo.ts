@@ -1,6 +1,6 @@
 import "server-only";
 import { siteUrl } from "@/lib/env";
-import { formatMoney } from "@/lib/format";
+import { bnMoney } from "@/lib/format";
 import type { PublicProduct, PublicSettings } from "@/lib/types";
 
 /** Absolute URL for a site-relative path (leaves absolute URLs untouched). */
@@ -16,12 +16,6 @@ function clip(text: string, max: number) {
   return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), max - 20)).replace(/[,.;:—\s-]+$/, "")}…`;
 }
 
-/** First short fragment of a spec value ("3 ATM / 30 m — ছিটা সহনীয়" → "3 ATM / 30 m"). */
-function short(value: string | undefined) {
-  const first = value?.split(/\s[—(]/)[0]?.replace(/[\u0980-\u09FF]+/g, "").replace(/\s+/g, " ").trim();
-  return first || undefined;
-}
-
 function lowestPrice(product: PublicProduct) {
   const prices = product.variants.map((v) => v.price).filter((p) => p > 0);
   return prices.length ? Math.min(...prices) : product.price;
@@ -31,25 +25,23 @@ function isBangladesh(settings: PublicSettings) {
   return settings.currency.code === "BDT";
 }
 
+const hasWord = (text: string, re: RegExp) => re.test(text);
+
 export function seoTitle(product: PublicProduct, settings: PublicSettings) {
   if (product.seo.title) return product.seo.title;
-  const name = /watch/i.test(product.title) ? product.title : `${product.title} Watch`;
-  const where = isBangladesh(settings) ? " Price in Bangladesh" : "";
+  const name = hasWord(product.title, /ঘড়ি|watch/i) ? product.title : `${product.title} ঘড়ি`;
+  const where = isBangladesh(settings) ? " — বাংলাদেশে দাম" : "";
   return clip(`${name}${where} | ${settings.brandName}`, 65);
 }
 
 export function seoDescription(product: PublicProduct, settings: PublicSettings) {
   if (product.seo.description) return product.seo.description;
-  const s = product.specs;
-  const features = [short(s.movement) && `${short(s.movement)} movement`, short(s.dialSize), short(s.calendar), short(s.waterResistance)]
-    .filter(Boolean)
-    .join(", ");
-  const colours = product.variants.length > 1 ? ` ${product.variants.map((v) => v.name).join(", ")} dials.` : "";
-  const price = ` From ${formatMoney(lowestPrice(product), settings.currency)}`;
-  const cod = settings.codEnabled ? `, cash on delivery${isBangladesh(settings) ? " in Bangladesh" : ""}.` : ".";
-  const lead = `${product.title} men's watch${features ? `: ${features}` : ""}.`;
+  const lead = `${product.title} — ছেলেদের ঘড়ি।`;
+  const colours = product.variants.length > 1 ? ` ${product.variants.map((v) => v.name).join(", ")} রঙে পাওয়া যাচ্ছে।` : "";
+  const price = ` দাম ${bnMoney(lowestPrice(product), settings.currency)} থেকে`;
+  const cod = settings.codEnabled ? `, ঘড়ি হাতে পেয়ে টাকা দিন।` : "।";
   // Drop the least important parts until it fits Google's ~160 character snippet.
-  for (const text of [`${lead}${colours}${price}${cod}`, `${lead}${price}${cod}`, `${lead}${price}.`]) {
+  for (const text of [`${lead}${colours}${price}${cod}`, `${lead}${price}${cod}`, `${lead}${price}।`]) {
     if (text.length <= 160) return text;
   }
   return clip(lead, 160);
@@ -59,12 +51,12 @@ export function keywords(product: PublicProduct, settings: PublicSettings) {
   const bd = isBangladesh(settings);
   return [
     product.title,
-    `${product.title} watch`,
-    bd && `${product.title} price in Bangladesh`,
-    product.specs.brand && `${product.specs.brand} watch`,
-    bd && product.specs.brand && `${product.specs.brand} watch price in BD`,
-    "men's watch",
-    short(product.specs.movement) && `${short(product.specs.movement)} watch`,
+    `${product.title} ঘড়ি`,
+    bd && `${product.title} দাম`,
+    product.specs.brand && `${product.specs.brand} ঘড়ি`,
+    bd && product.specs.brand && `${product.specs.brand} ঘড়ির দাম`,
+    "ছেলেদের ঘড়ি",
+    "হাতঘড়ি",
     settings.brandName,
   ].filter(Boolean) as string[];
 }
@@ -92,15 +84,15 @@ export function organizationJsonLd(settings: PublicSettings) {
         ...(settings.contact.email ? { email: settings.contact.email } : {}),
         ...(settings.contact.phone ? { telephone: settings.contact.phone } : {}),
         ...(settings.contact.address ? { address: settings.contact.address } : {}),
-        ...(isBangladesh(settings) ? { areaServed: { "@type": "Country", name: "Bangladesh" } } : {}),
+        ...(isBangladesh(settings) ? { areaServed: { "@type": "Country", name: "বাংলাদেশ" } } : {}),
         ...(settings.contact.phone || settings.contact.email
           ? {
               contactPoint: {
                 "@type": "ContactPoint",
-                contactType: "customer service",
+                contactType: "গ্রাহক সেবা",
                 ...(settings.contact.phone ? { telephone: settings.contact.phone } : {}),
                 ...(settings.contact.email ? { email: settings.contact.email } : {}),
-                availableLanguage: ["Bengali", "English"],
+                availableLanguage: ["Bengali"],
               },
             }
           : {}),
@@ -111,7 +103,7 @@ export function organizationJsonLd(settings: PublicSettings) {
         "@id": `${base}/#website`,
         name: settings.brandName,
         url: `${base}/`,
-        inLanguage: ["bn-BD", "en"],
+        inLanguage: "bn-BD",
         publisher: { "@id": ORG_ID() },
       },
     ],
@@ -130,23 +122,23 @@ export function productJsonLd(product: PublicProduct, settings: PublicSettings) 
   const description = clip(product.description || product.tagline || seoDescription(product, settings), 5000);
 
   const specLabels: Partial<Record<keyof PublicProduct["specs"], string>> = {
-    movement: "Movement",
-    powerSource: "Power source",
-    caseShape: "Case shape",
-    dialSize: "Case diameter",
-    caseThickness: "Case thickness",
-    caseMaterial: "Case material",
-    strapMaterial: "Strap material",
-    bandLength: "Band length",
-    bandWidth: "Band width",
-    clasp: "Clasp",
-    display: "Display",
-    calendar: "Calendar",
-    luminous: "Luminous",
-    waterResistance: "Water resistance",
-    glass: "Glass",
-    origin: "Origin",
-    warranty: "Warranty",
+    movement: "মেশিন",
+    powerSource: "চলে যেভাবে",
+    caseShape: "ডায়ালের আকার",
+    dialSize: "ডায়ালের মাপ",
+    caseThickness: "পুরুত্ব",
+    caseMaterial: "বডির উপাদান",
+    strapMaterial: "বেল্ট",
+    bandLength: "বেল্টের দৈর্ঘ্য",
+    bandWidth: "বেল্টের চওড়া",
+    clasp: "লক",
+    display: "ডিসপ্লে",
+    calendar: "ক্যালেন্ডার",
+    luminous: "অন্ধকারে জ্বলে",
+    waterResistance: "পানি সহনীয়তা",
+    glass: "কাচ",
+    origin: "তৈরি",
+    warranty: "ওয়ারেন্টি",
   };
   const additionalProperty = Object.entries(specLabels)
     .map(([k, name]) => {
@@ -159,7 +151,7 @@ export function productJsonLd(product: PublicProduct, settings: PublicSettings) 
     product.videoUrl && product.updatedAt
       ? {
           "@type": "VideoObject",
-          name: `${product.title} — product video`,
+          name: `${product.title} — ভিডিও`,
           description: clip(seoDescription(product, settings), 300),
           contentUrl: absoluteUrl(product.videoUrl),
           thumbnailUrl: realImages.slice(0, 1),

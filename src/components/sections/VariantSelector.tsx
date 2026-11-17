@@ -6,12 +6,12 @@ import { goToOrder } from "@/components/motion/scroll";
 import { Icon } from "@/components/ui/Icon";
 import { QuantityStepper } from "@/components/storefront/PurchaseControls";
 import { useStorefront } from "@/components/storefront/StorefrontProvider";
-import { formatMoney } from "@/lib/format";
+import { bn, bnMoney } from "@/lib/format";
 
 /** Section 5 — each edition with its own image, price, SKU and live availability. */
 export function VariantSelector() {
   const { product, variant, setVariantKey, settings, maxQuantity, quantity, subtotal } = useStorefront();
-  const money = (n: number) => formatMoney(n, settings.currency);
+  const money = (n: number) => bnMoney(n, settings.currency);
 
   const cols = product.variants.length >= 5 ? "lg:grid-cols-5" : product.variants.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3";
 
@@ -38,7 +38,7 @@ export function VariantSelector() {
             <QuantityStepper id="editions-qty" />
             <span className="num text-2xl font-extrabold text-ink" aria-live="polite">
               {money(subtotal)}
-              <span className="sr-only"> ({quantity}টি)</span>
+              <span className="sr-only"> ({bn(quantity)}টি)</span>
             </span>
           </div>
         </div>
@@ -102,7 +102,7 @@ export function VariantSelector() {
                     </p>
                     {v.available ? (
                       <p className={`num text-xs ${v.stock <= 3 ? "font-semibold text-offer" : "text-success"}`}>
-                        {v.stock <= 3 ? `মাত্র ${v.stock}টি বাকি` : "স্টকে আছে"}
+                        {v.stock <= 3 ? `মাত্র ${bn(v.stock)}টি বাকি` : "স্টকে আছে"}
                       </p>
                     ) : null}
                   </div>
@@ -112,7 +112,7 @@ export function VariantSelector() {
           </div>
         </fieldset>
         {maxQuantity > 0 && maxQuantity < settings.maxQuantityPerOrder ? (
-          <p className="num mt-5 text-sm text-mist">এই রঙের সর্বোচ্চ {maxQuantity}টি অর্ডার করা যাবে।</p>
+          <p className="num mt-5 text-sm text-mist">এই রঙের সর্বোচ্চ {bn(maxQuantity)}টি অর্ডার করা যাবে।</p>
         ) : null}
         <div className="mt-8 flex justify-center">
           <Button size="lg" onClick={goToOrder} disabled={variant.stock < 1} className="w-full sm:w-auto sm:min-w-80">

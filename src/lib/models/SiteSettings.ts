@@ -38,7 +38,7 @@ const TestimonialSchema = new Schema(
 const SiteSettingsSchema = new Schema(
   {
     key: { type: String, default: "main" },
-    brandName: { type: String, default: "MR Imperial", trim: true, maxlength: 60 },
+    brandName: { type: String, default: "এমআর ইম্পেরিয়াল", trim: true, maxlength: 60 },
     logoUrl: { type: String, trim: true, maxlength: 600 },
     announcement: { type: String, trim: true, maxlength: 160 },
     hero: {
@@ -80,7 +80,7 @@ const SiteSettingsSchema = new Schema(
       type: String,
       trim: true,
       maxlength: 400,
-      default: "Hello MR Imperial, I'd like to order {product} ({variant}) × {quantity}.",
+      default: "আসসালামু আলাইকুম, আমি {product} ({variant}) — {quantity}টি অর্ডার করতে চাই।",
     },
     maxQuantityPerOrder: { type: Number, min: 1, max: 99, default: 5 },
   },
